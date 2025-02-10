@@ -9,10 +9,11 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "minotor": "^1.0.0",
+    "minotor": "^1.0.3",
     "next": "15.1.6",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "unzipit": "^1.4.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

@@ -1,4 +1,10 @@
+"use client";
+import dynamic from "next/dynamic";
+
 const Home = () => {
+  const TransitRouter = dynamic(() => import("./example/TransitRouter"), {
+    ssr: false,
+  });
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-hanken-sans)]">
       <main className="flex flex-col gap-8 gap-y-4 row-start-2 items-center sm:items-start max-w-screen-md">
@@ -21,10 +27,25 @@ const Home = () => {
         </h2>
         <section className="text-justify space-y-4">
           <p>
-            Unlike most transit planners out there, minotor can store all the
-            transit data for a given day in memory on the client, allowing for
-            fast runtime queries using only local data.{" "}
+            Minotor is an open-source transit router library supporting GTFS
+            feeds. Unlike most transit planners out there, minotor can store all
+            the transit data for a given day in memory on the client, allowing
+            for fast runtime queries using only local data.{" "}
           </p>
+        </section>
+        <div className="flex gap-4 items-center flex-col sm:flex-row">
+          <a
+            className="rounded-full border border-solid border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
+            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Get started
+          </a>
+        </div>
+        <TransitRouter />
+        <section className="text-justify space-y-4 mt-2">
+          <h2 className="text-xl sm:text-2xl">Documentation</h2>
           <p>
             This is particularly useful for highly dynamic applications or
             complex visualizations for research purposes where the user needs to
@@ -39,17 +60,6 @@ const Home = () => {
             as a protobuf binary that can be loaded from the router.
           </p>
         </section>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Get started
-          </a>
-        </div>
       </main>
       <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
         <a
