@@ -1,10 +1,15 @@
 "use client";
 import dynamic from "next/dynamic";
+import { FaGithubAlt } from "react-icons/fa";
+import { LuCopy } from "react-icons/lu";
 
 const Home = () => {
-  const TransitRouter = dynamic(() => import("./example/TransitRouter"), {
-    ssr: false,
-  });
+  const TransitRouter = dynamic(
+    () => import("./examples/router/TransitRouter"),
+    {
+      ssr: false,
+    },
+  );
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-hanken-sans)]">
       <main className="flex flex-col gap-8 gap-y-4 row-start-2 items-center sm:items-start max-w-screen-md">
@@ -12,7 +17,7 @@ const Home = () => {
           m<span className="text-accent">i</span>notor
         </h1>
         <h2 className="text-xl sm:text-2xl">
-          A lightweight public transit router built for{" "}
+          A public transit routing library built for{" "}
           <span className="text-accent inline-flex flex-col h-[calc(theme(fontSize.xl)*theme(lineHeight.tight))] sm:h-[calc(theme(fontSize.2xl)*theme(lineHeight.tight))] overflow-hidden">
             <ul className="block animate-text-slide text-left leading-tight [&_li]:block">
               <li>data viz.</li>
@@ -27,52 +32,89 @@ const Home = () => {
         </h2>
         <section className="text-justify space-y-4">
           <p>
-            Minotor is an open-source transit router library supporting GTFS
-            feeds. Unlike most transit planners out there, minotor can store all
-            the transit data for a given day in memory on the client, allowing
-            for fast runtime queries using only local data.{" "}
+            Minotor is an open-source transit routing library for the browser,
+            nodejs servers and react-native apps. It supports extended GTFS
+            feeds parsing, complex routing queries, geographic and textual stops
+            search. Unlike most transit planners out there, minotor can store
+            all the transit data for a given day in memory on the client,
+            allowing for fast runtime queries using only local data.{" "}
           </p>
         </section>
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
+        <div className="flex gap-4 items-center flex-col sm:flex-row pt-4">
+          <code className="bg-black text-white px-7 py-4 rounded-full text-sm tracking-tight border-2 border-accent font-[family-name:var(--font-dm-mono)] flex items-center">
+            npm i minotor
+            <button
+              onClick={() => navigator.clipboard.writeText("npm i minotor")}
+              className="ml-4"
+            >
+              <LuCopy />
+            </button>
+          </code>
           <a
-            className="rounded-full border border-solid border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+            className="rounded-full border border-solid border-white/[.145] transition-colors justify-center hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 flex gap-2 items-center"
+            href="https://github.com/aubryio/minotor"
             target="_blank"
             rel="noopener noreferrer"
+          >
+            <FaGithubAlt className="text-xl" />
+          </a>
+          <a
+            className="rounded-full border border-solid border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
+            href="#documentation"
           >
             Get started
           </a>
         </div>
-        <TransitRouter />
-        <section className="text-justify space-y-4 mt-2">
-          <h2 className="text-xl sm:text-2xl">Documentation</h2>
+        <section
+          id="example-usage"
+          className="text-justify space-y-4 mt-2 pt-10"
+        >
+          <h2 className="text-xl sm:text-2xl">
+            <a href="#example-usage" className="hover:underline text-gray-400">
+              #
+            </a>{" "}
+            Example usage
+          </h2>
           <p>
-            This is particularly useful for highly dynamic applications or
-            complex visualizations for research purposes where the user needs to
-            query the data in real-time. Privacy-conscious applications where
-            the user does not want to share their location data with a server
-            can also benefit from this model.
+            An example client-side transit router running in the browser with a
+            web worker. It uses the full data from the Swiss GTFS feed for a
+            day, loaded in memory (it works offline too). Check out{" "}
+            <a
+              href="https://github.com/aubryio/minotor.dev/app/examples/router"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:underline text-accent"
+            >
+              the code
+            </a>
+            .
           </p>
-          <p>
-            The transit router and the stops index of minotor can run in the
-            browser, on react-native or in a Node.js environment. Transit data
-            (GTFS) parsing runs on Node.js, and the resulting data is serialized
-            as a protobuf binary that can be loaded from the router.
-          </p>
+          <div className="py-6">
+            <TransitRouter />
+          </div>
+        </section>
+        <section id="documentation" className="text-justify space-y-4 mt-2">
+          <h2 className="text-xl sm:text-2xl">
+            <a href="#documentation" className="hover:underline text-gray-400">
+              #
+            </a>{" "}
+            Documentation
+          </h2>
+          <p>See GitHub Repo for now.</p>
         </section>
       </main>
       <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
         <a
           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+          href="https://github.com/aubryio/minotor.dev"
           target="_blank"
           rel="noopener noreferrer"
         >
-          GitHub
+          Documentation Repo
         </a>
         <a
           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+          href="https://aubry.io"
           target="_blank"
           rel="noopener noreferrer"
         >

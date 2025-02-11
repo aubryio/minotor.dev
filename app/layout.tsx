@@ -15,7 +15,7 @@ const dmMono = DM_Mono({
 
 export const metadata: Metadata = {
   title: "minotor",
-  description: "A lightweight client-side public transit router.",
+  description: "A lightweight client-side public transit routing library.",
 };
 
 export default function RootLayout({

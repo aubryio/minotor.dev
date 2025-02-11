@@ -1,7 +1,7 @@
 "use client";
 import { setOptions, unzip } from "unzipit";
 
-setOptions({ workerURL: "/unzipit-worker.module.js" });
+setOptions({ workerURL: "/workers/unzipit-worker.module.js" });
 
 export const fetchCompressedData = async (
   location: string,
@@ -10,7 +10,8 @@ export const fetchCompressedData = async (
   const blob = await response.blob();
   const { entries: entries } = await unzip(blob);
   const file = await entries[Object.keys(entries)[0]].blob();
-  return await file.bytes();
+  const arrayBuffer = await file.arrayBuffer();
+  return new Uint8Array(arrayBuffer);
 };
 
 type SuspenseResult<T> = {
@@ -38,9 +39,9 @@ export function suspensify<T>(promise: Promise<T>): SuspenseResult<T> {
       if (status === "pending") {
         throw suspender;
       } else if (status === "error") {
-        throw error; // This is now typed as `unknown`
+        throw error;
       } else {
-        return result; // This is typed as `T`
+        return result;
       }
     },
   };

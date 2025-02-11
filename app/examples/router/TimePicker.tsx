@@ -1,23 +1,33 @@
 "use client";
-import { Time } from "minotor";
 import { FC, useState } from "react";
 
 const TimePicker: FC<
   {
-    value: Time;
-    onChange: (newTime: Time) => void;
+    value: Date;
+    onChange: (newTime: Date) => void;
   } & Omit<React.InputHTMLAttributes<HTMLInputElement>, "value" | "onChange">
 > = ({ value, onChange, ...props }) => {
   const [internalValue, setInternalValue] = useState(
-    value.toString().slice(0, 5),
+    value.toLocaleTimeString("en-CH", { hour: "2-digit", minute: "2-digit" }),
   );
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const timeString = e.target.value;
     try {
-      const newTime = Time.fromString(timeString + ":00");
-      setInternalValue(timeString);
-      onChange(newTime);
+      const [hours, minutes] = timeString.split(":").map(Number);
+      if (
+        !isNaN(hours) &&
+        !isNaN(minutes) &&
+        hours >= 0 &&
+        hours < 24 &&
+        minutes >= 0 &&
+        minutes < 60
+      ) {
+        const newTime = new Date(value);
+        newTime.setHours(hours, minutes);
+        setInternalValue(timeString);
+        onChange(newTime);
+      }
     } catch {
       // ignore
     }

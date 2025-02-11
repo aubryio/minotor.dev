@@ -1,18 +1,39 @@
 {
   "name": "minotor.dev",
   "version": "0.1.0",
+  "description": "Documentation and examples for minotor, a lightweight client-side transit router.",
+  "keywords": [
+    "minotor",
+    "raptor",
+    "transit",
+    "planner",
+    "transport",
+    "router",
+    "gtfs",
+    "trains",
+    "netex"
+  ],
   "private": true,
+  "homepage": "https://minotor.dev",
+  "bugs": "https://github.com/aubryio/minotor.dev/issues",
+  "author": "Aubry Cholleton <aubry.cholleton@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aubryio/minotor.dev.git"
+  },
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
-    "minotor": "^1.0.3",
-    "next": "15.1.6",
+    "minotor": "^1.0.5",
+    "next": "^15.1.7",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-icons": "^5.4.0",
     "unzipit": "^1.4.3"
   },
   "devDependencies": {

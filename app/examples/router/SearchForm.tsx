@@ -10,7 +10,7 @@ const SearchForm: FC = () => {
   const dispatch = useRouteSearchDispatch();
   const routeSearch = useRouteSearch();
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
+    <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 justify-between items-center">
       <Suspense fallback="Loading stops...">
         <StopsIndexProvider>
           <label htmlFor="origin" className="self-center">

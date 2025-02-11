@@ -1,5 +1,5 @@
 "use client";
-import { Result, StopId, Time } from "minotor";
+import { Result, StopId } from "minotor";
 import { createContext, Dispatch, useContext, useReducer } from "react";
 
 const RouteSearchContext = createContext<RouteSearchState | undefined>(
@@ -82,7 +82,7 @@ const routeSearchReducer = (
 export type RouteSearchState = {
   origin: StopId;
   destination: StopId;
-  departureTime: Time;
+  departureTime: Date;
   nbTransfers: number;
   result?: Result;
 };
@@ -91,11 +91,11 @@ export type RouteSearchAction =
   | { type: "set_origin"; origin: StopId }
   | { type: "set_destination"; destination: StopId }
   | { type: "set_nb_transfers"; nbTransfers: number }
-  | { type: "set_departure_time"; time: Time };
+  | { type: "set_departure_time"; time: Date };
 
 const initialRouteSearchState = {
-  origin: "",
-  destination: "",
-  departureTime: Time.fromDate(new Date()),
+  origin: "Parent8504100",
+  destination: "Parent8504748",
+  departureTime: new Date(new Date().setHours(8, 0, 0, 0)),
   nbTransfers: 5,
 };
