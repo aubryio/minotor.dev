@@ -29,7 +29,7 @@ const VehicleLegItem: FC<{ leg: VehicleLeg }> = ({ leg }) => {
             {to.name}
           </h3>
           {to.platform && (
-            <p className="text-sm text-gray-600">Platform: {to.platform}</p>
+            <p className="text-sm text-gray-600">Pl. {to.platform}</p>
           )}
         </div>
       </div>
