@@ -80,7 +80,7 @@ const Home = () => {
             web worker. It uses the full data from the Swiss GTFS feed for a
             day, loaded in memory (it works offline too). Check out{" "}
             <a
-              href="https://github.com/aubryio/minotor.dev/app/examples/router"
+              href="https://github.com/aubryio/minotor.dev/tree/main/app/examples/router"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:underline text-accent"
