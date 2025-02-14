@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Analytics } from '@vercel/analytics/next';
 import { DM_Mono, Hanken_Grotesk } from 'next/font/google';
 import './globals.css';
 
@@ -27,6 +28,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${hankenSans.variable} ${dmMono.variable} antialiased`}>
         {children}
+        <Analytics />
       </body>
     </html>
   );
