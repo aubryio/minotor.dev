@@ -1,10 +1,10 @@
-"use client";
-import { Router, StopsIndex, Timetable } from "minotor";
-import React, { createContext, useContext } from "react";
-import { fetchCompressedData, suspensify } from "./utils";
+'use client';
+import { Router, StopsIndex, Timetable } from 'minotor';
+import React, { createContext, useContext } from 'react';
+import { fetchCompressedData, suspensify } from './utils';
 
-const timetableLocation = "/timetable.zip";
-const stopsIndexLocation = "/stops.zip";
+const timetableLocation = '/timetable.zip';
+const stopsIndexLocation = '/stops.zip';
 
 const fetchRouter = async (): Promise<Router> => {
   const timetableData = await fetchCompressedData(timetableLocation);
@@ -32,7 +32,7 @@ export const RouterProvider: React.FC<{ children: React.ReactNode }> = ({
 export const useRouter = () => {
   const context = useContext(RouterContext);
   if (context === undefined) {
-    throw new Error("useRouter must be used within a RouterProvider");
+    throw new Error('useRouter must be used within a RouterProvider');
   }
   return context;
 };

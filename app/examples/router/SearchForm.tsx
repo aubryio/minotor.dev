@@ -1,16 +1,16 @@
-"use client";
-import { FC, Suspense } from "react";
-import { StopsIndexProvider } from "./StopsIndexContext";
-import StopSearchField from "./StopSearchField";
-import TimePicker from "./TimePicker";
-import { StopId } from "minotor";
-import { useRouteSearch, useRouteSearchDispatch } from "./RouteSearchContext";
+'use client';
+import { FC, Suspense } from 'react';
+import { StopsIndexProvider } from './StopsIndexContext';
+import StopSearchField from './StopSearchField';
+import TimePicker from './TimePicker';
+import { StopId } from 'minotor';
+import { useRouteSearch, useRouteSearchDispatch } from './RouteSearchContext';
 
 const SearchForm: FC = () => {
   const dispatch = useRouteSearchDispatch();
   const routeSearch = useRouteSearch();
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 justify-between items-center">
+    <div className="flex flex-col items-center justify-between space-y-2 sm:flex-row sm:items-center sm:space-x-2 sm:space-y-0">
       <Suspense fallback="Loading stops...">
         <StopsIndexProvider>
           <label htmlFor="origin" className="self-center">
@@ -20,7 +20,7 @@ const SearchForm: FC = () => {
             value={routeSearch.origin}
             onChange={(stop: StopId) => {
               dispatch({
-                type: "set_origin",
+                type: 'set_origin',
                 origin: stop,
               });
             }}
@@ -34,7 +34,7 @@ const SearchForm: FC = () => {
             value={routeSearch.destination}
             onChange={(stop) => {
               dispatch({
-                type: "set_destination",
+                type: 'set_destination',
                 destination: stop,
               });
             }}
@@ -50,7 +50,7 @@ const SearchForm: FC = () => {
         value={routeSearch.departureTime}
         onChange={(time) => {
           dispatch({
-            type: "set_departure_time",
+            type: 'set_departure_time',
             time: time,
           });
         }}

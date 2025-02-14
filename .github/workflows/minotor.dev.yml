@@ -1,0 +1,53 @@
+name: minotor.dev
+
+on: [push]
+
+jobs:
+  format:
+    name: 💅 Prettier
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+      - uses: bahmutov/npm-install@v1
+      - name: 💅 Prettier
+        run: npm run format:check
+
+  lint:
+    name: 🔍 ESLint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+      - uses: bahmutov/npm-install@v1
+      - name: ⬣ Next Lint
+        run: npm run lint
+
+  audit:
+    name: 🛡️ Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+      - name: 🛡️ Audit
+        run: npm audit --audit-level=high
+
+  spell:
+    name: 🔠 Spellcheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+      - uses: bahmutov/npm-install@v1
+      - name: 🈸 Spellcheck
+        run: npm run spell:check
+
+  type:
+    name: ʦ Typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+      - uses: bahmutov/npm-install@v1
+      - name: ʦ Typecheck
+        run: npm run type:check

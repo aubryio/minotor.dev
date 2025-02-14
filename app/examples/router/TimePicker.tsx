@@ -1,20 +1,20 @@
-"use client";
-import { FC, useState } from "react";
+'use client';
+import { FC, useState } from 'react';
 
 const TimePicker: FC<
   {
     value: Date;
     onChange: (newTime: Date) => void;
-  } & Omit<React.InputHTMLAttributes<HTMLInputElement>, "value" | "onChange">
+  } & Omit<React.InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange'>
 > = ({ value, onChange, ...props }) => {
   const [internalValue, setInternalValue] = useState(
-    value.toLocaleTimeString("en-CH", { hour: "2-digit", minute: "2-digit" }),
+    value.toLocaleTimeString('en-CH', { hour: '2-digit', minute: '2-digit' }),
   );
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const timeString = e.target.value;
     try {
-      const [hours, minutes] = timeString.split(":").map(Number);
+      const [hours, minutes] = timeString.split(':').map(Number);
       if (
         !isNaN(hours) &&
         !isNaN(minutes) &&
@@ -37,7 +37,7 @@ const TimePicker: FC<
     <input
       type="time"
       id="time"
-      className="border rounded-full px-4 py-2 w-max-30 bg-white focus:outline-none focus:bg-[#f6f6f6] text-black"
+      className="w-max-30 rounded-full border bg-white px-4 py-2 text-black focus:bg-[#f6f6f6] focus:outline-none"
       value={internalValue}
       onChange={handleChange}
       required

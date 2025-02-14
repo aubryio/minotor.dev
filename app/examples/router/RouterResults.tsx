@@ -1,6 +1,6 @@
-"use client";
-import React, { FC, useState, useEffect, useRef } from "react";
-import { useRouteSearch } from "./RouteSearchContext";
+'use client';
+import React, { FC, useState, useEffect, useRef } from 'react';
+import { useRouteSearch } from './RouteSearchContext';
 import {
   Duration,
   Leg,
@@ -11,9 +11,9 @@ import {
   Transfer,
   TransferType,
   VehicleLeg,
-} from "minotor";
-import VehicleLegItem from "./VehicleLegItem";
-import TransferLegItem from "./TransferLegItem";
+} from 'minotor';
+import VehicleLegItem from './VehicleLegItem';
+import TransferLegItem from './TransferLegItem';
 
 type SerializedDuration = { totalSeconds: number };
 type SerializedTime = { secondsSinceMidnight: number };
@@ -43,7 +43,7 @@ const convertSerializedRouteToRoute = (
   serializedRoute: SerializedRoute,
 ): Route => {
   const convertLeg = (serializedLeg: SerializedLeg): VehicleLeg | Transfer => {
-    if ("route" in serializedLeg) {
+    if ('route' in serializedLeg) {
       const vehicleLeg: VehicleLeg = {
         from: serializedLeg.from,
         to: serializedLeg.to,
@@ -80,9 +80,9 @@ const RouterResults: FC = () => {
 
   useEffect(() => {
     workerRef.current = new Worker(
-      new URL("routerWorker.ts", import.meta.url),
+      new URL('routerWorker.ts', import.meta.url),
       {
-        type: "module",
+        type: 'module',
       },
     );
     workerRef.current.onmessage = (event: MessageEvent<SerializedRoute>) => {
@@ -112,7 +112,7 @@ const RouterResults: FC = () => {
   }
 
   const timeline = routeResult?.legs.map((leg) => {
-    if ("route" in leg) {
+    if ('route' in leg) {
       return (
         <VehicleLegItem
           leg={leg}

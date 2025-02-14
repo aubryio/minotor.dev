@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { StopsIndex } from "minotor";
-import React, { createContext, useContext } from "react";
-import { fetchCompressedData, suspensify } from "./utils";
+import { StopsIndex } from 'minotor';
+import React, { createContext, useContext } from 'react';
+import { fetchCompressedData, suspensify } from './utils';
 
-const stopsIndexLocation = "/stops.zip";
+const stopsIndexLocation = '/stops.zip';
 
 const fetchStopsIndex = async (): Promise<StopsIndex> => {
   const stopsIndexData = await fetchCompressedData(stopsIndexLocation);
@@ -30,7 +30,7 @@ export const StopsIndexProvider: React.FC<{ children: React.ReactNode }> = ({
 export const useStopsIndex = () => {
   const context = useContext(StopsIndexContext);
   if (context === undefined) {
-    throw new Error("useStopsIndex must be used within a StopsIndexProvider");
+    throw new Error('useStopsIndex must be used within a StopsIndexProvider');
   }
   return context;
 };
