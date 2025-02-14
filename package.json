@@ -26,7 +26,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "format:check": "prettier . --check",
+    "format": "prettier --write .",
+    "spell:check": "cspell \"{README.md,.github/*.md,app/**/*.tsx}\" -u",
+    "type:check": "tsc --noEmit"
   },
   "dependencies": {
     "minotor": "^1.0.5",
@@ -41,9 +45,12 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "cspell": "^8.17.3",
     "eslint": "^9",
     "eslint-config-next": "15.1.6",
+    "eslint-config-prettier": "^10.0.1",
     "postcss": "^8",
+    "prettier-plugin-tailwindcss": "^0.6.11",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
   }

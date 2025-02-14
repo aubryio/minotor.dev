@@ -1,15 +1,14 @@
-import { Router, StopsIndex, Timetable, Query, Time } from "minotor";
-import { fetchCompressedData } from "./utils";
+import { Router, StopsIndex, Timetable, Query, Time } from 'minotor';
+import { fetchCompressedData } from './utils';
 
 let cachedRouter: Router | null = null;
 
-// Function to initialize and cache the Router
 async function initializeRouter() {
   if (cachedRouter) {
     return cachedRouter;
   }
-  const timetableLocation = "/timetable.zip";
-  const stopsIndexLocation = "/stops.zip";
+  const timetableLocation = '/timetable.zip';
+  const stopsIndexLocation = '/stops.zip';
 
   const timetableData = await fetchCompressedData(timetableLocation);
   const timetable = Timetable.fromData(timetableData);
@@ -22,7 +21,6 @@ async function initializeRouter() {
   return cachedRouter;
 }
 
-// Message handler for route search queries
 self.onmessage = async function (event) {
   const routeSearch = event.data;
 

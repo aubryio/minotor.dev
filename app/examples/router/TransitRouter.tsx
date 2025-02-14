@@ -1,8 +1,8 @@
-"use client";
-import { FC } from "react";
-import { RouteSearchProvider } from "./RouteSearchContext";
-import SearchForm from "./SearchForm";
-import RouterResults from "./RouterResults";
+'use client';
+import { FC } from 'react';
+import { RouteSearchProvider } from './RouteSearchContext';
+import SearchForm from './SearchForm';
+import RouterResults from './RouterResults';
 
 const TransitRouter: FC = () => {
   return (

@@ -1,35 +1,35 @@
-import { LiaTramSolid } from "react-icons/lia";
-import { LiaSubwaySolid } from "react-icons/lia";
-import { LiaTrainSolid } from "react-icons/lia";
-import { LiaBusSolid } from "react-icons/lia";
-import { IoBoatOutline } from "react-icons/io5";
-import { PiCableCar } from "react-icons/pi";
-import { LiaCogSolid } from "react-icons/lia";
-import { LiaBusAltSolid } from "react-icons/lia";
-import { RouteType } from "minotor";
-import { FC } from "react";
+import { LiaTramSolid } from 'react-icons/lia';
+import { LiaSubwaySolid } from 'react-icons/lia';
+import { LiaTrainSolid } from 'react-icons/lia';
+import { LiaBusSolid } from 'react-icons/lia';
+import { IoBoatOutline } from 'react-icons/io5';
+import { PiCableCar } from 'react-icons/pi';
+import { LiaCogSolid } from 'react-icons/lia';
+import { LiaBusAltSolid } from 'react-icons/lia';
+import { RouteType } from 'minotor';
+import { FC } from 'react';
 
 const RouteTypeIcon: FC<{ routeType: RouteType }> = ({ routeType }) => {
   switch (routeType) {
-    case "TRAM":
+    case 'TRAM':
       return <LiaTramSolid />;
-    case "SUBWAY":
+    case 'SUBWAY':
       return <LiaSubwaySolid />;
-    case "RAIL":
+    case 'RAIL':
       return <LiaTrainSolid />;
-    case "BUS":
+    case 'BUS':
       return <LiaBusSolid />;
-    case "FERRY":
+    case 'FERRY':
       return <IoBoatOutline />;
-    case "CABLE_TRAM":
+    case 'CABLE_TRAM':
       return <PiCableCar />;
-    case "AERIAL_LIFT":
+    case 'AERIAL_LIFT':
       return <PiCableCar />;
-    case "FUNICULAR":
+    case 'FUNICULAR':
       return <LiaCogSolid />;
-    case "TROLLEYBUS":
+    case 'TROLLEYBUS':
       return <LiaBusAltSolid />;
-    case "MONORAIL":
+    case 'MONORAIL':
       return <LiaTrainSolid />;
     default:
       return <LiaTrainSolid />;

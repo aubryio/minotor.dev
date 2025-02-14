@@ -1,21 +1,21 @@
-import type { Metadata } from "next";
-import { DM_Mono, Hanken_Grotesk } from "next/font/google";
-import "./globals.css";
+import type { Metadata } from 'next';
+import { DM_Mono, Hanken_Grotesk } from 'next/font/google';
+import './globals.css';
 
 const hankenSans = Hanken_Grotesk({
-  variable: "--font-hanken-sans",
-  subsets: ["latin"],
+  variable: '--font-hanken-sans',
+  subsets: ['latin'],
 });
 
 const dmMono = DM_Mono({
-  variable: "--font-dm-mono",
-  weight: "400",
-  subsets: ["latin"],
+  variable: '--font-dm-mono',
+  weight: '400',
+  subsets: ['latin'],
 });
 
 export const metadata: Metadata = {
-  title: "minotor",
-  description: "A lightweight client-side public transit routing library.",
+  title: 'minotor',
+  description: 'A lightweight client-side public transit routing library.',
 };
 
 export default function RootLayout({
