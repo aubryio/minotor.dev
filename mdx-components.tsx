@@ -5,8 +5,8 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     a: ({ href, children }) => (
       <a
         href={href}
-        target="_blank"
-        rel="noopener noreferrer"
+        target={href.startsWith('#') ? undefined : '_blank'}
+        rel={href.startsWith('#') ? undefined : 'noopener noreferrer'}
         className="text-accent hover:underline"
       >
         {children}
