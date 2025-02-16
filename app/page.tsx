@@ -2,6 +2,7 @@
 import dynamic from 'next/dynamic';
 import { FaGithubAlt } from 'react-icons/fa';
 import { LuCopy } from 'react-icons/lu';
+import GetStarted from '../doc/get-started.mdx';
 
 const Home = () => {
   const TransitRouter = dynamic(
@@ -73,7 +74,7 @@ const Home = () => {
             <a href="#example-usage" className="text-gray-400 hover:underline">
               #
             </a>{' '}
-            Example usage
+            Examples
           </h2>
           <p>
             An example client-side transit router running in the browser with a
@@ -85,7 +86,7 @@ const Home = () => {
               rel="noopener noreferrer"
               className="text-accent hover:underline"
             >
-              the code
+              the code from this example
             </a>
             .
           </p>
@@ -93,17 +94,26 @@ const Home = () => {
             <TransitRouter />
           </div>
         </section>
-        <section id="documentation" className="mt-2 space-y-4 text-justify">
+
+        <section id="documentation" className="mt-2 space-y-5 text-justify">
           <h2 className="text-xl sm:text-2xl">
             <a href="#documentation" className="text-gray-400 hover:underline">
               #
             </a>{' '}
-            Documentation
+            Get started
           </h2>
-          <p>See GitHub Repo for now.</p>
+          <GetStarted />
         </section>
       </main>
       <footer className="row-start-3 flex flex-wrap items-center justify-center gap-6">
+        <a
+          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
+          href="https://github.com/aubryio/minotor"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Minotor Repo
+        </a>
         <a
           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
           href="https://github.com/aubryio/minotor.dev"
@@ -120,6 +130,9 @@ const Home = () => {
         >
           Author
         </a>
+        <div className="flex w-full items-center justify-center text-sm text-gray-500">
+          © 2025 Aubry Cholleton
+        </div>
       </footer>
     </div>
   );
