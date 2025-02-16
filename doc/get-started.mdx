@@ -58,7 +58,12 @@ const stopFromId = stopsIndex.findStopById('8592374:0:A');
 Or by location (e.g. find the 5 closest stops within 500m):
 
 ```typescript
-const nearbyStops = stopsIndex.findStopsByLocation(46.80314924, 7.1510478, 5, 0.5);
+const nearbyStops = stopsIndex.findStopsByLocation(
+  46.80314924,
+  7.1510478,
+  5,
+  0.5,
+);
 ```
 
 ### Routing
@@ -73,7 +78,7 @@ const router = new Router(timetable, stopsIndex);
 const query = new Query.Builder()
   .from('Parent8504100')
   .to('Parent8504748')
-  .departureTime(Time.fromHMS(8,0,0))
+  .departureTime(Time.fromHMS(8, 0, 0))
   .maxTransfers(5)
   .build();
 
