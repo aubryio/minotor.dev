@@ -1,0 +1,129 @@
+### Installation
+
+```bash
+npm i minotor
+```
+
+for CLI usage install globally (see [CLI Usage](#cli-usage) below):
+
+```bash
+npm i -g minotor
+```
+
+### Data sources
+
+[opentransportdata.swiss](opentransportdata.swiss) provides a [GTFS feed for Switzerland](https://data.opentransportdata.swiss/en/dataset/timetable-2025-gtfs2020) that is supported by the library.
+
+```bash
+wget https://data.opentransportdata.swiss/en/dataset/timetable-2025-gtfs2020/permalink -O gtfs-feed.zip
+```
+
+GTFS feeds from other providers and other regions can be used as well but are not officially supported yet.
+
+### GTFS Feed parsing
+
+Parse the swiss GTFS feed for the current day:
+
+```typescript
+import { GtfsParser, chGtfsProfile } from 'minotor/parser';
+
+const parser = new GtfsParser('gtfs-feed.zip', chGtfsProfile);
+const { timetable, stopsIndex } = await parser.parse(new Date());
+```
+
+Note that this operation can take a few minutes for large GTFS feeds and requires a Node.js environment.
+
+`timetable` and `stopsIndex` are binary protobufs that can be serialized and loaded (e.g. from the browser) for later use.
+
+### Stop Search
+
+Lookup stops by name:
+
+```typescript
+const origins = stopsIndex.findStopsByName('Fribourg');
+```
+
+Partial and fuzzy matches are also supported:
+
+```typescript
+const destinations = stopsIndex.findStopsByName('Moles');
+```
+
+Query stops by ID:
+
+```typescript
+const stopFromId = stopsIndex.findStopById('8592374:0:A');
+```
+
+Or by location (e.g. find the 5 closest stops within 500m):
+
+```typescript
+const nearbyStops = stopsIndex.findStopsByLocation(46.80314924, 7.1510478, 5, 0.5);
+```
+
+### Routing
+
+Build the routing graph according to the parameters in the query:
+
+```typescript
+import { Query, Router, Time } from 'minotor';
+
+const router = new Router(timetable, stopsIndex);
+
+const query = new Query.Builder()
+  .from('Parent8504100')
+  .to('Parent8504748')
+  .departureTime(Time.fromHMS(8, 0, 0))
+  .maxTransfers(5)
+  .build();
+
+const result = router.route(query);
+```
+
+Get the route between origin and the closest destination (optionally provide another destination stop than the one in the query, the resulting route will be found if it's reachable before the first query destination reached).
+
+```typescript
+const bestRoute = result.bestRoute();
+```
+
+Get the arrival time to any stop (optionally provide the max number of transfers if you're interested in a lower one than the one provided in the query).
+This time will be correct for any stop reachable before the first query destination reached.
+
+```typescript
+const arrivalTime = result.arrivalAt(toStop.id);
+```
+
+### CLI Usage
+
+A simple CLI is provided to parse GTFS feeds and query the router interactively.
+
+```bash
+npm i -g minotor
+```
+
+Parse GTFS data for a day and output the timetable and stops index, using the swiss GTFS profile (`minotor parse-gtfs -h` for more options):
+
+```bash
+minotor parse-gtfs gtfs_feed.zip -d 2025-02-16 -t timetable.bin -s stops.bin -p CH
+```
+
+Note that this operation can take a few minutes for very large GTFS feeds.
+Without extra parameters it saves the timetable and stopsIndex for the current day in `/tmp` as binary protobufs.
+
+Run the REPL to query the router or the stop index (`minotor repl -h` for more options):
+
+```bash
+minotor repl -t timetable.bin -s stops.bin
+```
+
+Search stops (`minotor> .find -h for more options`):
+
+```bash
+minotor> .find moleson
+```
+
+Query routes (`minotor> .route -h for more options`):
+
+```bash
+minotor> .route from fribourg to moleson at 08:00
+```
