@@ -11,7 +11,10 @@ const fetchStopsIndex = async (): Promise<StopsIndex> => {
   return StopsIndex.fromData(stopsIndexData);
 };
 
-const stopsIndexResource = suspensify<StopsIndex>(fetchStopsIndex());
+const stopsIndexResource = suspensify<StopsIndex>(
+  () => fetchStopsIndex(),
+  'fetchStopsIndex',
+);
 
 const StopsIndexContext = createContext<StopsIndex | undefined>(undefined);
 
