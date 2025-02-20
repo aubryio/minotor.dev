@@ -16,6 +16,7 @@ import {
 import VehicleLegItem from './VehicleLegItem';
 import TransferLegItem from './TransferLegItem';
 import PromiseWorker from 'promise-worker';
+import { FaRegSadTear } from 'react-icons/fa';
 import { suspensify } from './utils';
 
 type SearchParams = {
@@ -97,27 +98,32 @@ const RouterResults: FC = () => {
     },
   ).read();
 
-  const timeline = routeResult
-    ? routeResult.legs.map((leg) => {
-        if ('route' in leg) {
-          return (
-            <VehicleLegItem
-              leg={leg}
-              key={`${leg.from.id}-${leg.to.id}-${leg.route.name}-${leg.departureTime.toSeconds()}`}
-            />
-          );
-        } else {
-          return (
-            <TransferLegItem
-              leg={leg}
-              key={`${leg.from.id}-${leg.to.id}-${leg.type}`}
-            />
-          );
-        }
-      })
-    : [];
+  const timeline = routeResult?.legs.map((leg) => {
+    if ('route' in leg) {
+      return (
+        <VehicleLegItem
+          leg={leg}
+          key={`${leg.from.id}-${leg.to.id}-${leg.route.name}-${leg.departureTime.toSeconds()}`}
+        />
+      );
+    } else {
+      return (
+        <TransferLegItem
+          leg={leg}
+          key={`${leg.from.id}-${leg.to.id}-${leg.type}`}
+        />
+      );
+    }
+  });
 
-  return <div>{timeline}</div>;
+  return timeline ? (
+    <div>{timeline}</div>
+  ) : (
+    <div className="flex flex-col items-center">
+      <FaRegSadTear className="mb-2" />
+      <span>No route found.</span>
+    </div>
+  );
 };
 
 export default RouterResults;
