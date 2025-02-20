@@ -1,5 +1,5 @@
 'use client';
-import React, { FC, useState, useEffect, useRef } from 'react';
+import React, { FC } from 'react';
 import { useRouteSearch } from './RouteSearchContext';
 import {
   Duration,
@@ -7,6 +7,7 @@ import {
   Route,
   ServiceRoute,
   Stop,
+  StopId,
   Time,
   Transfer,
   TransferType,
@@ -14,7 +15,14 @@ import {
 } from 'minotor';
 import VehicleLegItem from './VehicleLegItem';
 import TransferLegItem from './TransferLegItem';
+import PromiseWorker from 'promise-worker';
+import { suspensify } from './utils';
 
+type SearchParams = {
+  origin: StopId;
+  destination: StopId;
+  departureTime: Date;
+};
 type SerializedDuration = { totalSeconds: number };
 type SerializedTime = { secondsSinceMidnight: number };
 type SerializedRoute = {
@@ -35,19 +43,14 @@ type SerializedVehicleLeg = SerializedBaseLeg & {
   arrivalTime: SerializedTime;
 };
 
-/**
- * Converts back a serialized route to a minotor route object.
- * This is required since web workers can only return basic types.
- */
+// Converts back a serialized route to a minotor route object
 const convertSerializedRouteToRoute = (
   serializedRoute: SerializedRoute,
 ): Route => {
   const convertLeg = (serializedLeg: SerializedLeg): VehicleLeg | Transfer => {
     if ('route' in serializedLeg) {
       const vehicleLeg: VehicleLeg = {
-        from: serializedLeg.from,
-        to: serializedLeg.to,
-        route: serializedLeg.route,
+        ...serializedLeg,
         departureTime: Time.fromSeconds(
           serializedLeg.departureTime.secondsSinceMidnight,
         ),
@@ -58,9 +61,8 @@ const convertSerializedRouteToRoute = (
       return vehicleLeg;
     } else {
       const transfer: Transfer = {
-        from: serializedLeg.from,
-        to: serializedLeg.to,
-        minTransferTime: serializedLeg?.minTransferTime
+        ...serializedLeg,
+        minTransferTime: serializedLeg.minTransferTime
           ? Duration.fromSeconds(serializedLeg.minTransferTime.totalSeconds)
           : undefined,
         type: serializedLeg.type as TransferType,
@@ -68,70 +70,54 @@ const convertSerializedRouteToRoute = (
       return transfer;
     }
   };
+
   const legs = serializedRoute.legs.map(convertLeg) as Leg[];
   return new Route(legs);
 };
 
+const routerWorker = new Worker(new URL('routerWorker.ts', import.meta.url), {
+  type: 'module',
+});
+const promiseWorker = new PromiseWorker(routerWorker);
+
 const RouterResults: FC = () => {
-  const [routeResult, setRouteResult] = useState<Route | undefined>(undefined);
-  const [loading, setLoading] = useState(true);
   const routeSearch = useRouteSearch();
-  const workerRef = useRef<Worker>(null);
+  const routeResult = suspensify<Route | undefined>(
+    async (searchParams: SearchParams) => {
+      const routeResult = await promiseWorker.postMessage(searchParams);
+      return routeResult
+        ? convertSerializedRouteToRoute(routeResult)
+        : undefined;
+    },
+    'routeResult',
+    {
+      origin: routeSearch.origin,
+      destination: routeSearch.destination,
+      departureTime: routeSearch.departureTime,
+    },
+  ).read();
 
-  useEffect(() => {
-    workerRef.current = new Worker(
-      new URL('routerWorker.ts', import.meta.url),
-      {
-        type: 'module',
-      },
-    );
-    workerRef.current.onmessage = (event: MessageEvent<SerializedRoute>) => {
-      if (event.data !== undefined) {
-        setRouteResult(convertSerializedRouteToRoute(event.data));
-      } else {
-        setRouteResult(undefined);
-      }
-      setLoading(false);
-    };
-    return () => {
-      workerRef.current?.terminate();
-    };
-  }, []);
+  const timeline = routeResult
+    ? routeResult.legs.map((leg) => {
+        if ('route' in leg) {
+          return (
+            <VehicleLegItem
+              leg={leg}
+              key={`${leg.from.id}-${leg.to.id}-${leg.route.name}-${leg.departureTime.toSeconds()}`}
+            />
+          );
+        } else {
+          return (
+            <TransferLegItem
+              leg={leg}
+              key={`${leg.from.id}-${leg.to.id}-${leg.type}`}
+            />
+          );
+        }
+      })
+    : [];
 
-  useEffect(() => {
-    setLoading(true);
-    if (workerRef.current === null) {
-      return;
-    }
-    workerRef.current.postMessage(routeSearch);
-    return;
-  }, [routeSearch]);
-
-  if (loading) {
-    return <p>Loading route...</p>;
-  }
-
-  const timeline = routeResult?.legs.map((leg) => {
-    if ('route' in leg) {
-      return (
-        <VehicleLegItem
-          leg={leg}
-          key={
-            leg.from.id +
-            leg.to.id +
-            leg.route.name +
-            leg.departureTime.toSeconds()
-          }
-        />
-      );
-    } else {
-      return (
-        <TransferLegItem leg={leg} key={leg.from.id + leg.to.id + leg.type} />
-      );
-    }
-  });
-
-  return <div>{routeResult ? timeline : <p>No route found.</p>}</div>;
+  return <div>{timeline}</div>;
 };
 
 export default RouterResults;

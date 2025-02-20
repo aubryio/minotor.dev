@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import { setOptions, unzip } from 'unzipit';
 
@@ -15,29 +16,41 @@ export const fetchCompressedData = async (
 };
 
 type SuspenseResult<T> = {
-  read(): T;
+  read: () => T;
 };
 
-export function suspensify<T>(promise: Promise<T>): SuspenseResult<T> {
+const cache = new Map<string, SuspenseResult<unknown>>();
+
+export function suspensify<T>(
+  promiseFactory: (...args: any[]) => Promise<T>,
+  key: string,
+  ...args: any[]
+): SuspenseResult<T> {
+  const cacheKey = `${key}:${JSON.stringify(args)}`;
+
+  if (cache.has(cacheKey)) {
+    return cache.get(cacheKey) as SuspenseResult<T>;
+  }
+
   let status: 'pending' | 'success' | 'error' = 'pending';
   let result: T;
   let error: unknown;
 
-  const suspender = promise.then(
-    (r: T) => {
+  const promise = promiseFactory(...args).then(
+    (r) => {
       status = 'success';
       result = r;
     },
-    (e: unknown) => {
+    (e) => {
       status = 'error';
       error = e;
     },
   );
 
-  return {
+  const suspenseResult: SuspenseResult<T> = {
     read() {
       if (status === 'pending') {
-        throw suspender;
+        throw promise;
       } else if (status === 'error') {
         throw error;
       } else {
@@ -45,4 +58,7 @@ export function suspensify<T>(promise: Promise<T>): SuspenseResult<T> {
       }
     },
   };
+
+  cache.set(cacheKey, suspenseResult);
+  return suspenseResult;
 }

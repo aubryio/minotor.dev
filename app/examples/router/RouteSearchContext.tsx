@@ -1,5 +1,5 @@
 'use client';
-import { Result, StopId } from 'minotor';
+import { StopId } from 'minotor';
 import { createContext, Dispatch, useContext, useReducer } from 'react';
 
 const RouteSearchContext = createContext<RouteSearchState | undefined>(
@@ -17,7 +17,6 @@ export const RouteSearchProvider: React.FC<{ children: React.ReactNode }> = ({
     routeSearchReducer,
     initialRouteSearchState,
   );
-
   return (
     <RouteSearchContext.Provider value={routeSearchState}>
       <RouteSearchDispatchContext.Provider value={dispatch}>
@@ -84,7 +83,6 @@ export type RouteSearchState = {
   destination: StopId;
   departureTime: Date;
   nbTransfers: number;
-  result?: Result;
 };
 
 export type RouteSearchAction =

@@ -1,5 +1,6 @@
-import { Router, StopsIndex, Timetable, Query, Time } from 'minotor';
+import { Router, StopsIndex, Timetable, Query, Time, StopId } from 'minotor';
 import { fetchCompressedData } from './utils';
+import registerPromiseWorker from 'promise-worker/register';
 
 let cachedRouter: Router | null = null;
 
@@ -20,19 +21,23 @@ async function initializeRouter() {
 
   return cachedRouter;
 }
-
-self.onmessage = async function (event) {
-  const routeSearch = event.data;
-
+type SearchParams = {
+  origin: StopId;
+  destination: StopId;
+  departureTime: Date;
+};
+const resolveRoute = async (searchParams: SearchParams) => {
   const router = await initializeRouter();
 
   const query = new Query.Builder()
-    .from(routeSearch.origin)
-    .to(routeSearch.destination)
-    .departureTime(Time.fromDate(routeSearch.departureTime))
+    .from(searchParams.origin)
+    .to(searchParams.destination)
+    .departureTime(Time.fromDate(searchParams.departureTime))
     .maxTransfers(4)
     .build();
 
   const result = router.route(query);
-  self.postMessage(result.bestRoute());
+  return result.bestRoute();
 };
+
+registerPromiseWorker(resolveRoute);
