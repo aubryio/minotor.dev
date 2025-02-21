@@ -8,9 +8,9 @@ import RouterResultsSkeleton from './RouterResultsSkeleton';
 const TransitRouter: FC = () => {
   return (
     <RouteSearchProvider>
-      <div className="flex flex-col items-center space-y-12">
+      <div className="flex flex-col items-center space-y-12 text-left">
         <SearchForm />
-        <div className="max-h-[500px] overflow-y-auto">
+        <div>
           <Suspense fallback={<RouterResultsSkeleton />}>
             <RouterResults />
           </Suspense>

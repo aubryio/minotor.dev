@@ -9,9 +9,22 @@ import { useRouteSearch, useRouteSearchDispatch } from './RouteSearchContext';
 const SearchForm: FC = () => {
   const dispatch = useRouteSearchDispatch();
   const routeSearch = useRouteSearch();
+
+  const fallbackSkeleton = (
+    <div className="flex flex-col items-center justify-between space-y-2 sm:flex-row sm:items-center sm:space-x-2 sm:space-y-0">
+      <label htmlFor="origin" className="self-center">
+        From
+      </label>
+      <div className="h-10 w-52 animate-pulse rounded-full bg-gray-200"></div>
+      <label htmlFor="destination" className="self-center">
+        to
+      </label>
+      <div className="h-10 w-52 animate-pulse rounded-full bg-gray-200"></div>
+    </div>
+  );
   return (
     <div className="flex flex-col items-center justify-between space-y-2 sm:flex-row sm:items-center sm:space-x-2 sm:space-y-0">
-      <Suspense fallback="Loading stops...">
+      <Suspense fallback={fallbackSkeleton}>
         <StopsIndexProvider>
           <label htmlFor="origin" className="self-center">
             From
