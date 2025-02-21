@@ -116,10 +116,31 @@ const RouterResults: FC = () => {
     }
   });
 
+  const transfers = routeResult?.legs
+    ? routeResult.legs.filter((l) => 'route' in l).length - 1
+    : 0;
+
   return timeline ? (
-    <div>{timeline}</div>
+    <div className="flex flex-col items-center gap-y-10">
+      {routeResult?.legs && routeResult.legs.length > 0 && (
+        <p className="font-bold">
+          Arrival at{' '}
+          <span className="text-accent">
+            {routeResult?.arrivalTime().toString()}
+          </span>{' '}
+          {transfers > 0 ? (
+            <>
+              with <span className="text-accent">{transfers}</span> transfers.
+            </>
+          ) : (
+            <>without transfers.</>
+          )}
+        </p>
+      )}
+      <div className="h-[400px] overflow-y-auto">{timeline}</div>
+    </div>
   ) : (
-    <div className="flex flex-col items-center">
+    <div className="flex min-h-[390px] flex-col items-center">
       <FaRegSadTear className="mb-2" />
       <span>No route found.</span>
     </div>

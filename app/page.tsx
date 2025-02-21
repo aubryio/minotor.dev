@@ -3,11 +3,17 @@ import dynamic from 'next/dynamic';
 import { FaGithubAlt } from 'react-icons/fa';
 import { LuCopy } from 'react-icons/lu';
 import GetStarted from '../doc/get-started.mdx';
+import { ErrorBoundary } from 'react-error-boundary';
 
 const Home = () => {
   const TransitRouter = dynamic(
     () => import('./examples/router/TransitRouter'),
     {
+      loading: () => (
+        <p className="flex min-h-[442px] items-center justify-center py-6">
+          Loading the demo...
+        </p>
+      ),
       ssr: false,
     },
   );
@@ -90,8 +96,16 @@ const Home = () => {
             </a>
             .
           </p>
-          <div className="py-6">
-            <TransitRouter />
+          <div>
+            <ErrorBoundary
+              fallback={
+                <p className="flex min-h-[442px] items-center justify-center py-6">
+                  Something went wrong with the router.
+                </p>
+              }
+            >
+              <TransitRouter />
+            </ErrorBoundary>
           </div>
         </section>
 
