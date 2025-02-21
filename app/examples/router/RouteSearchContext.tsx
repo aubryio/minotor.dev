@@ -94,6 +94,6 @@ export type RouteSearchAction =
 const initialRouteSearchState = {
   origin: 'Parent8504100',
   destination: 'Parent8504748',
-  departureTime: new Date(new Date().setHours(8, 0, 0, 0)),
+  departureTime: new Date(new Date().setHours(8, 30, 0, 0)),
   nbTransfers: 5,
 };
