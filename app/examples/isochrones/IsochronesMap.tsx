@@ -247,7 +247,7 @@ const IsochronesMap: FC = () => {
             <p>Computing isochrones...</p>
           </>
         ) : (
-          <p>Move the cursor or click on the map to adjust start stop.</p>
+          <p>Drag the cursor to adjust start stop.</p>
         )}
       </div>
       <div className="relative flex-grow overflow-hidden rounded-2xl">
@@ -264,7 +264,6 @@ const IsochronesMap: FC = () => {
           layers={layers}
           height="100%"
           width="100%"
-          onClick={updatePin}
           getTooltip={getTooltip}
         >
           <Map

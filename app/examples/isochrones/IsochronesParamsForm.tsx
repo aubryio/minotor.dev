@@ -76,6 +76,12 @@ const IsochronesParamsForm: FC = () => {
               cellSize: localCellSize,
             });
           }}
+          onTouchEnd={() => {
+            dispatch({
+              type: 'set_cell_size',
+              cellSize: localCellSize,
+            });
+          }}
           className="w-full accent-current"
         />
       </div>
