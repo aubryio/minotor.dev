@@ -2,7 +2,7 @@
 
 import { StopsIndex } from 'minotor';
 import React, { createContext, useContext } from 'react';
-import { fetchCompressedData, suspensify } from './utils';
+import { fetchCompressedData, suspensify } from '../utils';
 
 const stopsIndexLocation = '/stops.zip';
 

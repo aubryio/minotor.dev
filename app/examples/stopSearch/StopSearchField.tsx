@@ -11,11 +11,13 @@ const StopSearchField: FC<
   } & Omit<React.HTMLAttributes<HTMLDivElement>, 'value' | 'onChange'>
 > = ({ placeholder = 'Search for a stop', value, onChange, ...divProps }) => {
   const stopsIndex = useStopsIndex();
-  const [searchValue, setSearchValue] = useState<string>(() => {
-    const stop = stopsIndex.findStopById(value);
-    return stop ? stop.name : '';
-  });
+  const [searchValue, setSearchValue] = useState<string>('');
   const [isDropdownVisible, setIsDropdownVisible] = useState<boolean>(false);
+
+  useEffect(() => {
+    const stop = stopsIndex.findStopById(value);
+    setSearchValue(stop ? stop.name : '');
+  }, [stopsIndex, value]);
 
   const handleClickOutside = (event: MouseEvent) => {
     if ((event.target as Element).closest('.relative') === null) {

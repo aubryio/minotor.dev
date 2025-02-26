@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
+import { Duration } from 'luxon';
 import { setOptions, unzip } from 'unzipit';
 
 setOptions({ workerURL: '/workers/unzipit-worker.module.js' });
@@ -62,3 +63,21 @@ export function suspensify<T>(
   cache.set(cacheKey, suspenseResult);
   return suspenseResult;
 }
+
+export const humanizeDuration = (durationInSeconds: number, short = false) => {
+  const duration = Duration.fromObject({
+    seconds: durationInSeconds,
+  });
+  if (short) {
+    return duration
+      .toFormat("h'h'm'min's's'", { floor: true })
+      .replace(/^0h/, '')
+      .replace(/(?<!(^|\d))0min/, '')
+      .replace(/(?<!(^|\d))0s$/, '');
+  }
+  return duration
+    .toFormat("h 'hours' m 'minutes' s 'seconds'", { floor: true })
+    .replace(/^0 hours /, '')
+    .replace(/ 0 minutes /, '')
+    .replace(/ 0 seconds$/, '');
+};
