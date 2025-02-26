@@ -45,17 +45,17 @@ export const BANDS: ContourLayerProps['contours'] = [
     zIndex: 7,
   },
   {
-    threshold: [60 * 60 + 60 * 15, 60 * 60 * 2],
+    threshold: [60 * 60 + 60 * 15, 60 * 60 + 60 * 30],
     color: [0, 114, 255, 150],
     zIndex: 8,
   },
   {
-    threshold: [60 * 60 * 2, 60 * 60 * 2 + 60 * 20],
+    threshold: [60 * 60 + 60 * 30, 60 * 60 + 60 * 45],
     color: [0, 58, 255, 135],
     zIndex: 9,
   },
   {
-    threshold: [60 * 60 * 2 + 60 * 20, 60 * 60 * 3],
+    threshold: [60 * 60 + 60 * 45, 60 * 60 * 3],
     color: [153, 0, 255, 120],
     zIndex: 10,
   },
@@ -65,12 +65,12 @@ export const BANDS: ContourLayerProps['contours'] = [
     zIndex: 11,
   },
   {
-    threshold: [60 * 60 * 3 + 60 * 20, 60 * 60 * 4],
+    threshold: [60 * 60 * 3 + 60 * 20, 60 * 60 * 3 + 60 * 40],
     color: [255, 0, 255, 90],
     zIndex: 12,
   },
   {
-    threshold: [60 * 60 * 4, 60 * 60 * 5],
+    threshold: [60 * 60 * 3 + 60 * 40, 60 * 60 * 5],
     color: [255, 0, 224, 75],
     zIndex: 13,
   },
@@ -85,7 +85,7 @@ export const BANDS: ContourLayerProps['contours'] = [
     zIndex: 15,
   },
   {
-    threshold: [60 * 60 * 7, 60 * 60 * 8],
+    threshold: [60 * 60 * 7, 60 * 60 * 10],
     color: [255, 0, 137, 30],
     zIndex: 16,
   },
