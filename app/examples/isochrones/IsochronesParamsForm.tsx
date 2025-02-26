@@ -76,7 +76,7 @@ const IsochronesParamsForm: FC = () => {
               cellSize: localCellSize,
             });
           }}
-          className="w-full"
+          className="w-full accent-current"
         />
       </div>
     </div>

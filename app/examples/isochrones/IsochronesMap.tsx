@@ -240,7 +240,7 @@ const IsochronesMap: FC = () => {
 
   return (
     <div className="flex h-full w-full flex-col">
-      <div className="align-items flex flex-shrink-0 flex-row items-center justify-center pb-3 text-gray-400">
+      <div className="align-items flex h-16 flex-shrink-0 flex-row items-center justify-center pb-3 text-gray-400">
         {loading ? (
           <>
             <MdOutlineTravelExplore className="mr-2" />{' '}
@@ -255,7 +255,7 @@ const IsochronesMap: FC = () => {
           initialViewState={{
             longitude: 8.2275,
             latitude: 46.8182,
-            zoom: 6.7,
+            zoom: 6.5,
           }}
           controller={{
             dragPan: !isDragging,
