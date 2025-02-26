@@ -2,7 +2,7 @@ import { Transfer } from 'minotor';
 import { FC } from 'react';
 import { BsPersonWalking } from 'react-icons/bs';
 import { MdAirlineSeatReclineNormal } from 'react-icons/md';
-import { Duration } from 'luxon';
+import { humanizeDuration } from '../utils';
 
 const TransferLegItem: FC<{ leg: Transfer }> = ({ leg }) => {
   const { minTransferTime, type } = leg;
@@ -22,12 +22,7 @@ const TransferLegItem: FC<{ leg: Transfer }> = ({ leg }) => {
         <h3 className="text-md">
           {minTransferTime && (
             <span className="font-semibold">
-              {Duration.fromObject({
-                seconds: minTransferTime.toSeconds(),
-              })
-                .toFormat("h 'hours' m 'minutes' s 'seconds'", { floor: true })
-                .replace(/^0 hours /, '')
-                .replace(/ 0 seconds$/, '')}
+              {humanizeDuration(minTransferTime.toSeconds())}
             </span>
           )}{' '}
           {type === 'IN_SEAT' ? 'wait in seat' : 'walk'}

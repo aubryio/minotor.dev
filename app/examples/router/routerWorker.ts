@@ -1,5 +1,5 @@
 import { Router, StopsIndex, Timetable, Query, Time, StopId } from 'minotor';
-import { fetchCompressedData } from './utils';
+import { fetchCompressedData } from '../utils';
 import registerPromiseWorker from 'promise-worker/register';
 
 let cachedRouter: Router | null = null;
@@ -11,6 +11,8 @@ async function initializeRouter() {
   const timetableLocation = '/timetable.zip';
   const stopsIndexLocation = '/stops.zip';
 
+  // Our CDN won't enable compression for binary files
+  // so we handle it at application level
   const timetableData = await fetchCompressedData(timetableLocation);
   const timetable = Timetable.fromData(timetableData);
 
@@ -21,11 +23,13 @@ async function initializeRouter() {
 
   return cachedRouter;
 }
+
 type SearchParams = {
   origin: StopId;
   destination: StopId;
   departureTime: Date;
 };
+
 const resolveRoute = async (searchParams: SearchParams) => {
   const router = await initializeRouter();
 

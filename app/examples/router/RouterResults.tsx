@@ -17,7 +17,7 @@ import VehicleLegItem from './VehicleLegItem';
 import TransferLegItem from './TransferLegItem';
 import PromiseWorker from 'promise-worker';
 import { FaRegSadTear } from 'react-icons/fa';
-import { suspensify } from './utils';
+import { suspensify } from '../utils';
 
 type SearchParams = {
   origin: StopId;

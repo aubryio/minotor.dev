@@ -1,8 +1,8 @@
 'use client';
 import { FC, Suspense } from 'react';
-import { StopsIndexProvider } from './StopsIndexContext';
-import StopSearchField from './StopSearchField';
-import TimePicker from './TimePicker';
+import { StopsIndexProvider } from '../stopSearch/StopsIndexContext';
+import StopSearchField from '../stopSearch/StopSearchField';
+import TimePicker from '../TimePicker';
 import { StopId } from 'minotor';
 import { useRouteSearch, useRouteSearchDispatch } from './RouteSearchContext';
 

@@ -5,7 +5,7 @@ import SearchForm from './SearchForm';
 import RouterResults from './RouterResults';
 import RouterResultsSkeleton from './RouterResultsSkeleton';
 
-const TransitRouter: FC = () => {
+const TransitRouterExample: FC = () => {
   return (
     <RouteSearchProvider>
       <div className="flex flex-col items-center space-y-12 text-left">
@@ -20,4 +20,4 @@ const TransitRouter: FC = () => {
   );
 };
 
-export default TransitRouter;
+export default TransitRouterExample;
