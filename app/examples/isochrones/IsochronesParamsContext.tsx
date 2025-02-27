@@ -63,10 +63,10 @@ const isochronesParamsReducer = (
         departureTime: action.time,
       };
     }
-    case 'set_nb_transfers': {
+    case 'set_max_transfers': {
       return {
         ...isochronesParamsState,
-        nbTransfers: action.nbTransfers,
+        nbTransfers: action.maxTransfers,
       };
     }
     case 'set_cell_size': {
@@ -95,7 +95,7 @@ const isochronesParamsReducer = (
 export type IsochronesParamsState = {
   origin: StopId;
   departureTime: Date;
-  nbTransfers: number;
+  maxTransfers: number;
   cellSize: number;
   maxDuration: number;
   showTransfers: boolean;
@@ -103,7 +103,7 @@ export type IsochronesParamsState = {
 
 export type IsochronesParamsAction =
   | { type: 'set_origin'; origin: StopId }
-  | { type: 'set_nb_transfers'; nbTransfers: number }
+  | { type: 'set_max_transfers'; maxTransfers: number }
   | { type: 'set_departure_time'; time: Date }
   | { type: 'set_cell_size'; cellSize: number }
   | { type: 'set_max_duration'; maxDuration: number }
@@ -112,7 +112,7 @@ export type IsochronesParamsAction =
 const initialIsochronesParamsState = {
   origin: 'Parent8504100',
   departureTime: new Date(new Date().setHours(8, 30, 0, 0)),
-  nbTransfers: 5,
+  maxTransfers: 5,
   cellSize: 2000,
   maxDuration: 60 * 60 * 3,
   showTransfers: false,

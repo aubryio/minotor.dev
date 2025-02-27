@@ -67,6 +67,38 @@ const IsochronesParamsForm: FC = () => {
           id="time"
         />
       </div>
+      <div className="align-items mt-4 flex flex-row items-center justify-center">
+        <button
+          className={`rounded-l-full px-4 py-2 ${
+            isochronesParams.showTransfers === false
+              ? 'bg-blue-500 text-white'
+              : 'bg-gray-400'
+          }`}
+          onClick={() => {
+            dispatch({
+              type: 'set_show_transfers',
+              showTransfers: false,
+            });
+          }}
+        >
+          Time
+        </button>
+        <button
+          className={`rounded-r-full px-4 py-2 ${
+            isochronesParams.showTransfers === true
+              ? 'bg-blue-500 text-white'
+              : 'bg-gray-400'
+          }`}
+          onClick={() => {
+            dispatch({
+              type: 'set_show_transfers',
+              showTransfers: true,
+            });
+          }}
+        >
+          Transfers
+        </button>
+      </div>
       <div className="mt-4 flex flex-col items-center justify-center space-y-2 sm:flex-row">
         <label htmlFor="cellSize" className="mt-[8px] sm:w-2/3">
           Resolution: {localCellSize}m

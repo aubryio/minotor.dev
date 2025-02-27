@@ -24,6 +24,7 @@ const mapboxAccessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
 type ArrivalTime = {
   duration: number;
+  transfers: number;
   position: [number, number];
 };
 
@@ -32,7 +33,46 @@ const routerWorker = new Worker(new URL('routerWorker.ts', import.meta.url), {
 });
 const promiseWorker = new PromiseWorker(routerWorker);
 
-export const BANDS: ContourLayerProps['contours'] = [
+export const TRANSFER_BANDS: ContourLayerProps['contours'] = [
+  {
+    threshold: [0, 1],
+    color: [0, 255, 51, 255],
+    zIndex: 1,
+    strokeWidth: 0,
+  },
+  {
+    threshold: [1, 2],
+    color: [0, 255, 153, 235],
+    zIndex: 3,
+    strokeWidth: 0,
+  },
+  {
+    threshold: [2, 3],
+    color: [153, 0, 255, 165],
+    zIndex: 5,
+    strokeWidth: 0,
+  },
+  {
+    threshold: [3, 4],
+    color: [255, 0, 224, 135],
+    zIndex: 7,
+    strokeWidth: 0,
+  },
+  {
+    threshold: [4, 5],
+    color: [255, 0, 137, 105],
+    zIndex: 9,
+    strokeWidth: 0,
+  },
+  {
+    threshold: [5, 8],
+    color: [255, 0, 60, 75],
+    zIndex: 11,
+    strokeWidth: 0,
+  },
+];
+
+export const TIME_BANDS: ContourLayerProps['contours'] = [
   {
     threshold: [0, 60 * 10],
     color: [0, 255, 51, 255],
@@ -242,13 +282,13 @@ const IsochronesMap: FC = () => {
         data: filteredArrivals,
         aggregation: 'MIN',
         cellSize: isochronesParams.cellSize,
-        contours: BANDS,
+        contours: isochronesParams.showTransfers ? TRANSFER_BANDS : TIME_BANDS,
         opacity: 0.4,
         getPosition: (d: ArrivalTime) => {
           return d.position;
         },
         getWeight: (d: ArrivalTime) => {
-          return d.duration;
+          return isochronesParams.showTransfers ? d.transfers : d.duration;
         },
         pickable: true,
         gpuAggregation: false,
@@ -284,7 +324,13 @@ const IsochronesMap: FC = () => {
         },
       }),
     ],
-    [filteredArrivals, isochronesParams.cellSize, marker, updatePin],
+    [
+      filteredArrivals,
+      isochronesParams.cellSize,
+      isochronesParams.showTransfers,
+      marker,
+      updatePin,
+    ],
   );
 
   return (
