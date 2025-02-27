@@ -99,7 +99,7 @@ const IsochronesParamsForm: FC = () => {
       </div>
       <div className="mt-4 flex flex-col items-center justify-center space-y-2 sm:flex-row">
         <label htmlFor="cellSize" className="mt-[8px] sm:w-2/3">
-          Max duration: {humanizeDuration(isochronesParams.maxDuration, true)}
+          Max duration: {humanizeDuration(localMaxDuration, true)}
         </label>
         <input
           type="range"
