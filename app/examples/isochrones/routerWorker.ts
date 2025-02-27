@@ -65,7 +65,7 @@ const resolveArrivals = async (searchParams: SearchParams) => {
         transfers: reachingTime.legNumber - 1,
       };
     })
-    .filter((entry) => entry.duration < 60 * 60 * 5);
+    .filter((entry) => entry.duration < 60 * 60 * 8);
   return arrivals;
 };
 

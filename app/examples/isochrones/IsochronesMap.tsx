@@ -33,61 +33,119 @@ const routerWorker = new Worker(new URL('routerWorker.ts', import.meta.url), {
 const promiseWorker = new PromiseWorker(routerWorker);
 
 export const BANDS: ContourLayerProps['contours'] = [
-  { threshold: [0, 60 * 10], color: [0, 255, 51, 255], zIndex: 1 },
-  { threshold: [60 * 10, 60 * 20], color: [0, 255, 102, 240], zIndex: 2 },
-  { threshold: [60 * 20, 60 * 30], color: [0, 255, 153, 225], zIndex: 3 },
-  { threshold: [60 * 30, 60 * 40], color: [0, 255, 204, 210], zIndex: 4 },
-  { threshold: [60 * 40, 60 * 50], color: [0, 255, 255, 195], zIndex: 5 },
-  { threshold: [60 * 50, 60 * 60], color: [0, 228, 255, 180], zIndex: 6 },
+  {
+    threshold: [0, 60 * 10],
+    color: [0, 255, 51, 255],
+    zIndex: 1,
+    strokeWidth: 0,
+  },
+  {
+    threshold: [60 * 10, 60 * 20],
+    color: [0, 255, 102, 245],
+    zIndex: 2,
+    strokeWidth: 0,
+  },
+  {
+    threshold: [60 * 20, 60 * 30],
+    color: [0, 255, 153, 235],
+    zIndex: 3,
+    strokeWidth: 0,
+  },
+  {
+    threshold: [60 * 30, 60 * 40],
+    color: [0, 255, 204, 225],
+    zIndex: 4,
+    strokeWidth: 0,
+  },
+  {
+    threshold: [60 * 40, 60 * 50],
+    color: [0, 255, 255, 215],
+    zIndex: 5,
+    strokeWidth: 0,
+  },
+  {
+    threshold: [60 * 50, 60 * 60],
+    color: [0, 228, 255, 205],
+    zIndex: 6,
+    strokeWidth: 0,
+  },
   {
     threshold: [60 * 60, 60 * 60 + 60 * 15],
-    color: [0, 171, 255, 165],
+    color: [0, 171, 255, 195],
     zIndex: 7,
+    strokeWidth: 0,
   },
   {
     threshold: [60 * 60 + 60 * 15, 60 * 60 + 60 * 30],
-    color: [0, 114, 255, 150],
+    color: [0, 114, 255, 185],
     zIndex: 8,
+    strokeWidth: 0,
   },
   {
     threshold: [60 * 60 + 60 * 30, 60 * 60 + 60 * 45],
-    color: [0, 58, 255, 135],
+    color: [0, 58, 255, 175],
     zIndex: 9,
+    strokeWidth: 0,
   },
   {
     threshold: [60 * 60 + 60 * 45, 60 * 60 * 2],
-    color: [153, 0, 255, 120],
+    color: [153, 0, 255, 165],
     zIndex: 10,
+    strokeWidth: 0,
   },
   {
     threshold: [60 * 60 * 2, 60 * 60 * 2 + 60 * 20],
-    color: [204, 0, 255, 105],
+    color: [204, 0, 255, 155],
     zIndex: 11,
+    strokeWidth: 0,
   },
   {
     threshold: [60 * 60 * 2 + 60 * 20, 60 * 60 * 2 + 60 * 40],
-    color: [255, 0, 255, 90],
+    color: [255, 0, 255, 145],
     zIndex: 12,
+    strokeWidth: 0,
   },
   {
     threshold: [60 * 60 * 2 + 60 * 40, 60 * 60 * 3],
-    color: [255, 0, 224, 75],
+    color: [255, 0, 224, 135],
     zIndex: 13,
+    strokeWidth: 0,
   },
   {
     threshold: [60 * 60 * 3, 60 * 60 * 3 + 60 * 30],
-    color: [255, 0, 195, 60],
+    color: [255, 0, 195, 125],
     zIndex: 14,
+    strokeWidth: 0,
   },
   {
     threshold: [60 * 60 * 3 + 60 * 30, 60 * 60 * 4],
-    color: [255, 0, 165, 45],
+    color: [255, 0, 165, 115],
     zIndex: 15,
+    strokeWidth: 0,
   },
   {
-    threshold: [60 * 60 * 4, 60 * 60 * 8],
-    color: [255, 0, 137, 30],
+    threshold: [60 * 60 * 4, 60 * 60 * 4 + 60 * 30],
+    color: [255, 0, 137, 105],
     zIndex: 16,
+    strokeWidth: 0,
+  },
+  {
+    threshold: [60 * 60 * 4 + 60 * 30, 60 * 60 * 5],
+    color: [255, 0, 100, 95],
+    zIndex: 16,
+    strokeWidth: 0,
+  },
+  {
+    threshold: [60 * 60 * 5, 60 * 60 * 6],
+    color: [255, 0, 80, 85],
+    zIndex: 16,
+    strokeWidth: 0,
+  },
+  {
+    threshold: [60 * 60 * 6, 60 * 60 * 8],
+    color: [255, 0, 60, 75],
+    zIndex: 16,
+    strokeWidth: 0,
   },
 ];
 
@@ -100,18 +158,6 @@ const IsochronesMap: FC = () => {
   const [marker, setMarker] = useState<Marker | undefined>();
   const [isDragging, setIsDragging] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [cellSize, setCellSize] = useState(isochronesParams.cellSize);
-  const [hideIsochrones, setHideIsochrones] = useState(false);
-
-  // Prevent shifting glitch
-  // TODO investigate issue in contour layer
-  useEffect(() => {
-    setHideIsochrones(true);
-    setTimeout(() => {
-      setCellSize(isochronesParams.cellSize);
-      setHideIsochrones(false);
-    }, 20);
-  }, [isochronesParams.cellSize]);
 
   useEffect(() => {
     const stop = stopsIndex.findStopById(isochronesParams.origin);
@@ -130,13 +176,8 @@ const IsochronesMap: FC = () => {
         origin: isochronesParams.origin,
         departureTime: isochronesParams.departureTime,
       });
-
-      // prevents shifting glitch on some updates
-      setEarliestArrivals([]);
-      setTimeout(() => {
-        setLoading(false);
-        setEarliestArrivals(arrivals);
-      }, 20);
+      setLoading(false);
+      setEarliestArrivals(arrivals);
     };
     setLoading(true);
     fetchEarliestArrivals();
@@ -185,16 +226,22 @@ const IsochronesMap: FC = () => {
     },
     [dispatch, stopsIndex],
   );
-
+  const filteredArrivals = useMemo(
+    () =>
+      earliestArrivals.filter(
+        (arrival) => arrival.duration <= isochronesParams.maxDuration,
+      ),
+    [earliestArrivals, isochronesParams.maxDuration],
+  );
   const layers = useMemo(
     () => [
       new ContourLayer<ArrivalTime>({
         id: 'ContourLayer',
         //isochronesParams.departureTime.getMilliseconds() +
         //isochronesParams.origin,
-        data: hideIsochrones ? [] : earliestArrivals,
+        data: filteredArrivals,
         aggregation: 'MIN',
-        cellSize: cellSize,
+        cellSize: isochronesParams.cellSize,
         contours: BANDS,
         opacity: 0.4,
         getPosition: (d: ArrivalTime) => {
@@ -204,6 +251,8 @@ const IsochronesMap: FC = () => {
           return d.duration;
         },
         pickable: true,
+        gpuAggregation: false,
+        zOffset: 0,
       }),
       new IconLayer<Marker>({
         id: 'icon-layer',
@@ -235,7 +284,7 @@ const IsochronesMap: FC = () => {
         },
       }),
     ],
-    [hideIsochrones, earliestArrivals, cellSize, marker, updatePin],
+    [filteredArrivals, isochronesParams.cellSize, marker, updatePin],
   );
 
   return (
@@ -265,6 +314,7 @@ const IsochronesMap: FC = () => {
           height="100%"
           width="100%"
           getTooltip={getTooltip}
+          style={{ mixBlendMode: 'lighten' }}
         >
           <Map
             reuseMaps

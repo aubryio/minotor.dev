@@ -8,7 +8,7 @@ import { StopsIndexProvider } from '../stopSearch/StopsIndexContext';
 const IsochronesMapExample: FC = () => {
   return (
     <IsochronesParamsProvider>
-      <div className="box-border flex h-[600px] flex-col items-center space-y-8">
+      <div className="box-border flex h-[800px] flex-col items-center space-y-4">
         <IsochronesParamsForm />
         <div className="h-full w-full">
           <StopsIndexProvider>
