@@ -315,6 +315,7 @@ const IsochronesMap: FC = () => {
           width="100%"
           getTooltip={getTooltip}
           style={{ mixBlendMode: 'lighten' }}
+          useDevicePixels={false}
         >
           <Map
             reuseMaps
