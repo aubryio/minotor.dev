@@ -113,7 +113,7 @@ const initialIsochronesParamsState = {
   origin: 'Parent8504100',
   departureTime: new Date(new Date().setHours(8, 30, 0, 0)),
   nbTransfers: 5,
-  cellSize: 4000,
-  maxDuration: 60 * 60 * 4,
+  cellSize: 2000,
+  maxDuration: 60 * 60 * 3,
   showTransfers: false,
 };

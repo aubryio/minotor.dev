@@ -20,6 +20,9 @@ const IsochronesParamsForm: FC = () => {
   const dispatch = useIsochronesParamsDispatch();
   const isochronesParams = useIsochronesParams();
   const [localCellSize, setLocalCellSize] = useState(isochronesParams.cellSize);
+  const [localMaxDuration, setLocalMaxDuration] = useState(
+    isochronesParams.maxDuration,
+  );
 
   const fallbackSkeleton = (
     <div className="flex flex-col items-center justify-between space-y-2 sm:flex-row sm:items-center sm:space-x-2 sm:space-y-0">
@@ -104,11 +107,20 @@ const IsochronesParamsForm: FC = () => {
           min={MIN_DURATION}
           max={MAX_DURATION}
           step={60 * 5}
-          value={isochronesParams.maxDuration}
+          value={localMaxDuration}
           onChange={(e) => {
+            setLocalMaxDuration(Number(e.target.value));
+          }}
+          onMouseUp={() => {
             dispatch({
               type: 'set_max_duration',
-              maxDuration: Number(e.target.value),
+              maxDuration: localMaxDuration,
+            });
+          }}
+          onTouchEnd={() => {
+            dispatch({
+              type: 'set_max_duration',
+              maxDuration: localMaxDuration,
             });
           }}
           className="w-full accent-current"
