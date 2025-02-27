@@ -8,11 +8,21 @@ import {
   useIsochronesParams,
   useIsochronesParamsDispatch,
 } from './IsochronesParamsContext';
+import { humanizeDuration } from '../utils';
+
+const MIN_RESOLUTION = 500;
+const MAX_RESOLUTION = 6000;
+
+const MIN_DURATION = 60 * 10;
+const MAX_DURATION = 60 * 60 * 8;
 
 const IsochronesParamsForm: FC = () => {
   const dispatch = useIsochronesParamsDispatch();
   const isochronesParams = useIsochronesParams();
   const [localCellSize, setLocalCellSize] = useState(isochronesParams.cellSize);
+  const [localMaxDuration, setLocalMaxDuration] = useState(
+    isochronesParams.maxDuration,
+  );
 
   const fallbackSkeleton = (
     <div className="flex flex-col items-center justify-between space-y-2 sm:flex-row sm:items-center sm:space-x-2 sm:space-y-0">
@@ -57,18 +67,20 @@ const IsochronesParamsForm: FC = () => {
           id="time"
         />
       </div>
-      <div className="mt-4 flex flex-col items-center justify-between space-y-2 sm:flex-row">
-        <label htmlFor="cellSize" className="mt-[8px] w-2/3 self-center">
-          Isochrone resolution
+      <div className="mt-4 flex flex-col items-center justify-center space-y-2 sm:flex-row">
+        <label htmlFor="cellSize" className="mt-[8px] sm:w-2/3">
+          Resolution: {localCellSize}m
         </label>
         <input
           type="range"
           id="cellSize"
-          min="100"
-          max="10000"
-          value={localCellSize}
+          min={MIN_RESOLUTION}
+          max={MAX_RESOLUTION}
+          value={MAX_RESOLUTION - localCellSize + MIN_RESOLUTION}
           onChange={(e) => {
-            setLocalCellSize(Number(e.target.value));
+            setLocalCellSize(
+              MAX_RESOLUTION - Number(e.target.value) + MIN_RESOLUTION,
+            );
           }}
           onMouseUp={() => {
             dispatch({
@@ -80,6 +92,35 @@ const IsochronesParamsForm: FC = () => {
             dispatch({
               type: 'set_cell_size',
               cellSize: localCellSize,
+            });
+          }}
+          className="w-full accent-current"
+        />
+      </div>
+      <div className="mt-4 flex flex-col items-center justify-center space-y-2 sm:flex-row">
+        <label htmlFor="cellSize" className="mt-[8px] sm:w-2/3">
+          Max duration: {humanizeDuration(isochronesParams.maxDuration, true)}
+        </label>
+        <input
+          type="range"
+          id="maxDuration"
+          min={MIN_DURATION}
+          max={MAX_DURATION}
+          step={60 * 5}
+          value={localMaxDuration}
+          onChange={(e) => {
+            setLocalMaxDuration(Number(e.target.value));
+          }}
+          onMouseUp={() => {
+            dispatch({
+              type: 'set_max_duration',
+              maxDuration: localMaxDuration,
+            });
+          }}
+          onTouchEnd={() => {
+            dispatch({
+              type: 'set_max_duration',
+              maxDuration: localMaxDuration,
             });
           }}
           className="w-full accent-current"
