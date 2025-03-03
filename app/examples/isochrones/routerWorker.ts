@@ -78,7 +78,7 @@ const resolveArrivals = async (searchParams: SearchParams) => {
     );
 
   const filteredArrivals = Object.values(arrivals).filter(
-    (entry) => entry.duration < 60 * 60 * 8,
+    (entry) => entry.duration < 60 * 60 * 1,
   );
   return filteredArrivals;
 };
