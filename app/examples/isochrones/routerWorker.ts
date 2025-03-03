@@ -30,7 +30,6 @@ async function initializeRouter(): Promise<{
     const stopsIndexData = await fetchCompressedData(stopsIndexLocation);
     cachedStopsIndex = StopsIndex.fromData(stopsIndexData);
   }
-
   cachedRouter = new Router(timetable, cachedStopsIndex);
 
   return { router: cachedRouter, stopsIndex: cachedStopsIndex };
@@ -57,16 +56,31 @@ const resolveArrivals = async (searchParams: SearchParams) => {
       const stop = stopsIndex.findStopById(stopId);
       return stop !== undefined;
     })
-    .map(([stopId, reachingTime]: [StopId, ReachingTime]) => {
-      const stop = stopsIndex.findStopById(stopId)!;
-      return {
-        position: [stop.lon ?? 0, stop.lat ?? 0],
-        duration: reachingTime.time.toSeconds() - startTimestamp,
-        transfers: reachingTime.legNumber - 1,
-      };
-    })
-    .filter((entry) => entry.duration < 60 * 60 * 8);
-  return arrivals;
+    .reduce(
+      // only keep one entry per equivalent stop group to reduce rendering time
+      (acc, [stopId, reachingTime]: [StopId, ReachingTime]) => {
+        const stop = stopsIndex.findStopById(stopId)!;
+        const parentStopId = stop.parent ?? stopId;
+        const duration = reachingTime.time.toSeconds() - startTimestamp;
+        if (!acc[parentStopId] || acc[parentStopId].duration > duration) {
+          acc[parentStopId] = {
+            position: [stop.lon ?? 0, stop.lat ?? 0],
+            duration,
+            transfers: reachingTime.legNumber - 1,
+          };
+        }
+        return acc;
+      },
+      {} as Record<
+        StopId,
+        { position: [number, number]; duration: number; transfers: number }
+      >,
+    );
+
+  const filteredArrivals = Object.values(arrivals).filter(
+    (entry) => entry.duration < 60 * 60 * 8,
+  );
+  return filteredArrivals;
 };
 
 registerPromiseWorker(resolveArrivals);
