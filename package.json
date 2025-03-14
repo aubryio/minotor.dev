@@ -16,7 +16,7 @@
   "private": true,
   "homepage": "https://minotor.dev",
   "bugs": "https://github.com/aubryio/minotor.dev/issues",
-  "author": "Aubry Cholleton <aubry.cholleton@gmail.com>",
+  "author": "Aubry Cholleton <aubry@cholleton.com> (https://aubry.io)",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -44,7 +44,7 @@
     "@vercel/analytics": "^1.5.0",
     "luxon": "^3.5.0",
     "mapbox-gl": "^3.10.0",
-    "minotor": "^1.0.5",
+    "minotor": "^1.0.7",
     "next": "^15.1.7",
     "promise-worker": "^2.0.1",
     "react": "^19.0.0",

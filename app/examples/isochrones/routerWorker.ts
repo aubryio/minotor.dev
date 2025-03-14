@@ -46,7 +46,6 @@ const resolveArrivals = async (searchParams: SearchParams) => {
   const query = new Query.Builder()
     .from(searchParams.origin)
     .departureTime(Time.fromDate(searchParams.departureTime))
-    .to([])
     .maxTransfers(4)
     .build();
 
