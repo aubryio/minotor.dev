@@ -12,7 +12,7 @@ import {
 import { fetchCompressedData } from '../utils';
 import registerPromiseWorker from 'promise-worker/register';
 import { WeakLRUCache } from 'weak-lru-cache';
-import { isMobile } from 'react-device-detect';
+import { isIOS } from 'react-device-detect';
 
 let cachedRouter:
   | {
@@ -30,7 +30,7 @@ let cachedRouter:
 
 type QueryKey = string;
 const queryCache = new WeakLRUCache<QueryKey, Result>({
-  cacheSize: isMobile ? 1 : 20,
+  cacheSize: isIOS ? 1 : 20,
 });
 const queryKey = (query: Query): QueryKey => {
   return `${query.departureTime}-${query.from}-${query.options.maxTransfers}-${query.to.join(',')}`;
@@ -102,7 +102,7 @@ const resolveArrivals = async (
   const query = new Query.Builder()
     .from(searchParams.origin)
     .departureTime(Time.fromDate(searchParams.departureTime))
-    .maxTransfers(isMobile ? 4 : 5)
+    .maxTransfers(isIOS ? 4 : 5)
     .build();
   const key = queryKey(query);
   let result = queryCache.getValue(key);
@@ -137,7 +137,7 @@ const resolveArrivals = async (
       >,
     );
   const filteredArrivals = Object.values(arrivals).filter(
-    (entry) => entry.duration < 60 * 60 * (isMobile ? 3 : 8),
+    (entry) => entry.duration < 60 * 60 * (isIOS ? 3 : 8),
   );
   return filteredArrivals;
 };
@@ -149,7 +149,7 @@ const resolveRoute = async (
     .from(searchParams.origin)
     .to(searchParams.destination)
     .departureTime(Time.fromDate(searchParams.departureTime))
-    .maxTransfers(isMobile ? 4 : 5)
+    .maxTransfers(isIOS ? 4 : 5)
     .build();
   const key = queryKey(query);
   let result = queryCache.getValue(key);

@@ -1,7 +1,7 @@
 'use client';
 import { StopId } from 'minotor';
 import { createContext, Dispatch, useContext, useReducer } from 'react';
-import { isMobile } from 'react-device-detect';
+import { isIOS } from 'react-device-detect';
 
 const IsochronesParamsContext = createContext<
   IsochronesParamsState | undefined
@@ -99,6 +99,6 @@ const initialIsochronesParamsState = {
   origin: 'Parent8504100',
   departureTime: new Date(new Date().setHours(8, 30, 0, 0)),
   cellSize: 2000,
-  maxDuration: 60 * 60 * (isMobile ? 2 : 3),
+  maxDuration: 60 * 60 * (isIOS ? 2 : 3),
   showTransfers: false,
 };

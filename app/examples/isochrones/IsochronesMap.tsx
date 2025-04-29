@@ -16,7 +16,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { IconLayer } from '@deck.gl/layers';
 import { MdOutlineTravelExplore } from 'react-icons/md';
 import { humanizeDuration } from '../utils';
-import { isMobile } from 'react-device-detect';
+import { isIOS } from 'react-device-detect';
 import { promiseStopsIndexWorker } from '../stopSearch/promiseStopsWorker';
 import { promiseRouterWorker } from '../router/promiseRouterWorker';
 const mapStyle = 'mapbox://styles/aubry/cm7jpifn600ql01r302tdhig2';
@@ -328,9 +328,9 @@ const IsochronesMap: FC = () => {
           width="100%"
           getTooltip={getTooltip}
           style={{ mixBlendMode: 'plus-lighter' }}
-          useDevicePixels={!isMobile}
+          useDevicePixels={!isIOS}
           _typedArrayManagerProps={
-            isMobile ? { overAlloc: 1, poolSize: 0 } : undefined
+            isIOS ? { overAlloc: 1, poolSize: 0 } : undefined
           }
         >
           <Map
