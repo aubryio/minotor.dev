@@ -1,6 +1,5 @@
 'use client';
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
-import PromiseWorker from 'promise-worker';
 import {
   useIsochronesParams,
   useIsochronesParamsDispatch,
@@ -14,11 +13,12 @@ import {
 import type { PickingInfo } from '@deck.gl/core';
 import Map from 'react-map-gl/mapbox';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { useStopsIndex } from '../stopSearch/StopsIndexContext';
 import { IconLayer } from '@deck.gl/layers';
 import { MdOutlineTravelExplore } from 'react-icons/md';
 import { humanizeDuration } from '../utils';
-
+import { isMobile } from 'react-device-detect';
+import { promiseStopsIndexWorker } from '../stopSearch/promiseStopsWorker';
+import { promiseRouterWorker } from '../router/promiseRouterWorker';
 const mapStyle = 'mapbox://styles/aubry/cm7jpifn600ql01r302tdhig2';
 const mapboxAccessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
@@ -26,11 +26,6 @@ type ArrivalTime = {
   duration: number;
   position: [number, number];
 };
-
-const routerWorker = new Worker(new URL('routerWorker.ts', import.meta.url), {
-  type: 'module',
-});
-const promiseWorker = new PromiseWorker(routerWorker);
 
 export const BANDS: ContourLayerProps['contours'] = [
   {
@@ -152,7 +147,6 @@ export const BANDS: ContourLayerProps['contours'] = [
 type Marker = { latitude: number; longitude: number };
 const IsochronesMap: FC = () => {
   const isochronesParams = useIsochronesParams();
-  const stopsIndex = useStopsIndex();
   const dispatch = useIsochronesParamsDispatch();
   const [earliestArrivals, setEarliestArrivals] = useState<ArrivalTime[]>([]);
   const [marker, setMarker] = useState<Marker | undefined>();
@@ -160,19 +154,26 @@ const IsochronesMap: FC = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const stop = stopsIndex.findStopById(isochronesParams.origin);
-    if (!stop || !stop.lon || !stop.lat) {
-      return;
-    }
-    setMarker({
-      longitude: stop.lon,
-      latitude: stop.lat,
-    });
-  }, [isochronesParams.origin, stopsIndex]);
+    const fetchStop = async () => {
+      const stop = await promiseStopsIndexWorker.postMessage({
+        type: 'findStopById',
+        stopId: isochronesParams.origin,
+      });
+      if (!stop || !stop.lon || !stop.lat) {
+        return;
+      }
+      setMarker({
+        longitude: stop.lon,
+        latitude: stop.lat,
+      });
+    };
+    fetchStop();
+  }, [isochronesParams.origin]);
 
   useEffect(() => {
     const fetchEarliestArrivals = async () => {
-      const arrivals = await promiseWorker.postMessage({
+      const arrivals = await promiseRouterWorker.postMessage({
+        type: 'arrivalsResolution',
         origin: isochronesParams.origin,
         departureTime: isochronesParams.departureTime,
       });
@@ -202,16 +203,17 @@ const IsochronesMap: FC = () => {
         }
       : null;
   }, []);
+
   const updatePin = useCallback(
     (info: PickingInfo) => {
-      if (info.coordinate) {
-        const stops = stopsIndex.findStopsByLocation(
-          info.coordinate[1],
-          info.coordinate[0],
-          1,
-          10,
-        );
-
+      const fetchStops = async (lat: number, lon: number) => {
+        const stops = await promiseStopsIndexWorker.postMessage({
+          type: 'findStopsByLocation',
+          lat: lat,
+          lon: lon,
+          maxResults: 1,
+          radius: 10,
+        });
         if (stops && stops.length > 0) {
           setMarker({
             latitude: stops[0].lat!,
@@ -222,9 +224,12 @@ const IsochronesMap: FC = () => {
             origin: stops[0].id,
           });
         }
+      };
+      if (info.coordinate) {
+        fetchStops(info.coordinate[1], info.coordinate[0]);
       }
     },
-    [dispatch, stopsIndex],
+    [dispatch],
   );
   const filteredArrivals = useMemo(
     () =>
@@ -314,8 +319,11 @@ const IsochronesMap: FC = () => {
           height="100%"
           width="100%"
           getTooltip={getTooltip}
-          style={{ mixBlendMode: 'lighten' }}
-          useDevicePixels={false}
+          style={{ mixBlendMode: 'plus-lighter' }}
+          useDevicePixels={!isMobile}
+          _typedArrayManagerProps={
+            isMobile ? { overAlloc: 1, poolSize: 0 } : undefined
+          }
         >
           <Map
             reuseMaps
