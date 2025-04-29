@@ -14,7 +14,7 @@ const MIN_RESOLUTION = 500;
 const MAX_RESOLUTION = 6000;
 
 const MIN_DURATION = 60 * 10;
-const MAX_DURATION = 60 * 60 * (isMobile ? 4 : 8);
+const MAX_DURATION = 60 * 60 * (isMobile ? 3 : 8);
 
 const IsochronesParamsForm: FC = () => {
   const dispatch = useIsochronesParamsDispatch();

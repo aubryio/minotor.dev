@@ -29,7 +29,9 @@ let cachedRouter:
     };
 
 type QueryKey = string;
-const queryCache = new WeakLRUCache<QueryKey, Result>({ cacheSize: 50 });
+const queryCache = new WeakLRUCache<QueryKey, Result>({
+  cacheSize: isMobile ? 1 : 20,
+});
 const queryKey = (query: Query): QueryKey => {
   return `${query.departureTime}-${query.from}-${query.options.maxTransfers}-${query.to.join(',')}`;
 };
@@ -135,7 +137,7 @@ const resolveArrivals = async (
       >,
     );
   const filteredArrivals = Object.values(arrivals).filter(
-    (entry) => entry.duration < 60 * 60 * (isMobile ? 4 : 8),
+    (entry) => entry.duration < 60 * 60 * (isMobile ? 3 : 8),
   );
   return filteredArrivals;
 };
