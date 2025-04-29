@@ -1,6 +1,7 @@
 'use client';
 import { StopId } from 'minotor';
 import { createContext, Dispatch, useContext, useReducer } from 'react';
+import { isMobile } from 'react-device-detect';
 
 const IsochronesParamsContext = createContext<
   IsochronesParamsState | undefined
@@ -63,12 +64,6 @@ const isochronesParamsReducer = (
         departureTime: action.time,
       };
     }
-    case 'set_nb_transfers': {
-      return {
-        ...isochronesParamsState,
-        nbTransfers: action.nbTransfers,
-      };
-    }
     case 'set_cell_size': {
       return {
         ...isochronesParamsState,
@@ -81,12 +76,6 @@ const isochronesParamsReducer = (
         maxDuration: action.maxDuration,
       };
     }
-    case 'set_show_transfers': {
-      return {
-        ...isochronesParamsState,
-        showTransfers: action.showTransfers,
-      };
-    }
     default:
       return isochronesParamsState;
   }
@@ -95,7 +84,6 @@ const isochronesParamsReducer = (
 export type IsochronesParamsState = {
   origin: StopId;
   departureTime: Date;
-  nbTransfers: number;
   cellSize: number;
   maxDuration: number;
   showTransfers: boolean;
@@ -103,17 +91,14 @@ export type IsochronesParamsState = {
 
 export type IsochronesParamsAction =
   | { type: 'set_origin'; origin: StopId }
-  | { type: 'set_nb_transfers'; nbTransfers: number }
   | { type: 'set_departure_time'; time: Date }
   | { type: 'set_cell_size'; cellSize: number }
-  | { type: 'set_max_duration'; maxDuration: number }
-  | { type: 'set_show_transfers'; showTransfers: boolean };
+  | { type: 'set_max_duration'; maxDuration: number };
 
 const initialIsochronesParamsState = {
   origin: 'Parent8504100',
   departureTime: new Date(new Date().setHours(8, 30, 0, 0)),
-  nbTransfers: 5,
   cellSize: 2000,
-  maxDuration: 60 * 60 * 3,
+  maxDuration: 60 * 60 * (isMobile ? 2 : 3),
   showTransfers: false,
 };

@@ -12,6 +12,7 @@ import {
 import { fetchCompressedData } from '../utils';
 import registerPromiseWorker from 'promise-worker/register';
 import { WeakLRUCache } from 'weak-lru-cache';
+import { isMobile } from 'react-device-detect';
 
 let cachedRouter:
   | {
@@ -99,7 +100,7 @@ const resolveArrivals = async (
   const query = new Query.Builder()
     .from(searchParams.origin)
     .departureTime(Time.fromDate(searchParams.departureTime))
-    .maxTransfers(4)
+    .maxTransfers(isMobile ? 4 : 5)
     .build();
   const key = queryKey(query);
   let result = queryCache.getValue(key);
@@ -134,7 +135,7 @@ const resolveArrivals = async (
       >,
     );
   const filteredArrivals = Object.values(arrivals).filter(
-    (entry) => entry.duration < 60 * 60 * 5,
+    (entry) => entry.duration < 60 * 60 * (isMobile ? 4 : 8),
   );
   return filteredArrivals;
 };
@@ -146,7 +147,7 @@ const resolveRoute = async (
     .from(searchParams.origin)
     .to(searchParams.destination)
     .departureTime(Time.fromDate(searchParams.departureTime))
-    .maxTransfers(5)
+    .maxTransfers(isMobile ? 4 : 5)
     .build();
   const key = queryKey(query);
   let result = queryCache.getValue(key);
