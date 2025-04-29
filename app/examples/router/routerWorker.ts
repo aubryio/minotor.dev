@@ -89,20 +89,14 @@ type RoutingParams = {
   maxTransfers: number;
 };
 
-export type ArrivalTime = {
-  duration: number;
-  transfers: number;
-  position: [number, number];
-};
-
 const resolveArrivals = async (
   searchParams: ArrivalsResolutionParams,
-): Promise<ArrivalTime[]> => {
+): Promise<ArrayBuffer> => {
   const { router, stopsIndex } = await getRouter();
   const query = new Query.Builder()
     .from(searchParams.origin)
     .departureTime(Time.fromDate(searchParams.departureTime))
-    .maxTransfers(isIOS ? 4 : 5)
+    .maxTransfers(5)
     .build();
   const key = queryKey(query);
   let result = queryCache.getValue(key);
@@ -111,35 +105,34 @@ const resolveArrivals = async (
     queryCache.setValue(key, result);
   }
   const startTimestamp = Time.fromDate(searchParams.departureTime).toSeconds();
-  const arrivals = Array.from(result.earliestArrivals)
+  const bytesPerArrival = 12;
+
+  const filteredArrivals = Array.from(result.earliestArrivals)
     .filter(([stopId]) => {
       const stop = stopsIndex.findStopById(stopId);
       return stop !== undefined;
     })
-    .reduce(
-      // only keep one entry per equivalent stop group to reduce rendering time
-      (acc, [stopId, reachingTime]: [StopId, ReachingTime]) => {
-        const stop = stopsIndex.findStopById(stopId)!;
-        const parentStopId = stop.parent ?? stopId;
-        const duration = reachingTime.time.toSeconds() - startTimestamp;
-        if (!acc[parentStopId] || acc[parentStopId].duration > duration) {
-          acc[parentStopId] = {
-            position: [stop.lon ?? 0, stop.lat ?? 0],
-            duration,
-            transfers: reachingTime.legNumber - 1,
-          };
-        }
-        return acc;
-      },
-      {} as Record<
-        StopId,
-        { position: [number, number]; duration: number; transfers: number }
-      >,
+    .filter(
+      (entry) =>
+        entry[1].time.toSeconds() - startTimestamp < 60 * 60 * (isIOS ? 4 : 8),
     );
-  const filteredArrivals = Object.values(arrivals).filter(
-    (entry) => entry.duration < 60 * 60 * (isIOS ? 3 : 8),
-  );
-  return filteredArrivals;
+
+  const buffer = new ArrayBuffer(filteredArrivals.length * bytesPerArrival);
+  const view = new DataView(buffer);
+
+  let offset = 0;
+  filteredArrivals.forEach(([stopId, reachingTime]: [StopId, ReachingTime]) => {
+    const stop = stopsIndex.findStopById(stopId)!;
+    const position = [stop.lon ?? 0, stop.lat ?? 0] as [number, number];
+    const duration = reachingTime.time.toSeconds() - startTimestamp;
+
+    view.setFloat32(offset, position[0], true); // lon
+    view.setFloat32(offset + 4, position[1], true); // lat
+    view.setFloat32(offset + 8, duration, true); // duration
+    offset += bytesPerArrival;
+  });
+
+  return buffer;
 };
 
 const resolveRoute = async (

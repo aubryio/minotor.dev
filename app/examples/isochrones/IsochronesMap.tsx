@@ -144,6 +144,23 @@ export const BANDS: ContourLayerProps['contours'] = [
   },
 ];
 
+const parseArrayBuffer = (buffer: ArrayBuffer): ArrivalTime[] => {
+  const view = new DataView(buffer);
+  const arrivals: ArrivalTime[] = [];
+  const bytesPerArrival = 12;
+
+  for (let offset = 0; offset < view.byteLength; offset += bytesPerArrival) {
+    arrivals.push({
+      position: [
+        view.getFloat32(offset, true), // lon
+        view.getFloat32(offset + 4, true), // lat
+      ],
+      duration: view.getFloat32(offset + 8, true), // duration
+    });
+  }
+  return arrivals;
+};
+
 type Marker = { latitude: number; longitude: number };
 const IsochronesMap: FC = () => {
   const isochronesParams = useIsochronesParams();
@@ -178,7 +195,7 @@ const IsochronesMap: FC = () => {
         departureTime: isochronesParams.departureTime,
       });
       setLoading(false);
-      setEarliestArrivals(arrivals);
+      setEarliestArrivals(parseArrayBuffer(arrivals));
     };
     setLoading(true);
     fetchEarliestArrivals();
