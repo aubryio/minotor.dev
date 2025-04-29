@@ -1,18 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import { Duration } from 'luxon';
-import { setOptions, unzip } from 'unzipit';
-
-setOptions({ workerURL: '/workers/unzipit-worker.module.js' });
 
 export const fetchCompressedData = async (
   location: string,
 ): Promise<Uint8Array> => {
-  const response = await fetch(location);
+  const response = await fetch(location, {
+    headers: { Accept: 'application/octet-stream' },
+  });
   const blob = await response.blob();
-  const { entries: entries } = await unzip(blob);
-  const file = await entries[Object.keys(entries)[0]].blob();
-  const arrayBuffer = await file.arrayBuffer();
+  const stream = blob.stream();
+  const decompressionStream = new DecompressionStream('gzip');
+  const decompressedStream = stream.pipeThrough(decompressionStream);
+  const decompressedResponse = new Response(decompressedStream);
+  const arrayBuffer = await decompressedResponse.arrayBuffer();
   return new Uint8Array(arrayBuffer);
 };
 

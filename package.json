@@ -48,13 +48,14 @@
     "next": "^15.1.7",
     "promise-worker": "^2.0.1",
     "react": "^19.0.0",
+    "react-device-detect": "^2.2.3",
     "react-dom": "^19.0.0",
     "react-error-boundary": "^5.0.0",
     "react-icons": "^5.4.0",
     "react-map-gl": "^8.0.1",
     "rehype-pretty-code": "^0.14.0",
     "shiki": "^1.29.2",
-    "unzipit": "^1.4.3"
+    "weak-lru-cache": "^1.2.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

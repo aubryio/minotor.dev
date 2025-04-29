@@ -40,7 +40,7 @@ const Home = () => {
   }, [activeExample]);
 
   const TransitRouterExample = dynamic(
-    () => import('./examples/router/TransitRouterExample'),
+    () => import('./examples/planner/TransitRouterExample'),
     {
       loading: () => (
         <p className="flex min-h-[442px] items-center justify-center py-6">
@@ -185,7 +185,7 @@ const Home = () => {
               <p>
                 An example client-side transit router running in the browser
                 with a web worker. It uses the full data from the Swiss GTFS
-                feed for a day (Sunday February 9th 2025) from{' '}
+                feed for a day (Monday April 28th 2025) from{' '}
                 <a
                   href="https://opentransportdata.swiss"
                   target="_blank"
@@ -223,7 +223,7 @@ const Home = () => {
               <p>
                 An example isochrone map running in the browser with a web
                 worker. It uses the full data from the Swiss GTFS feed for a day
-                (Sunday February 9th 2025) from{' '}
+                (Monday April 28th 2025) from{' '}
                 <a
                   href="https://opentransportdata.swiss"
                   target="_blank"
@@ -285,7 +285,7 @@ const Home = () => {
           Author
         </a>
         <div className="flex w-full items-center justify-center text-sm text-gray-500">
-          © 2025 Aubry Cholleton
+          minotor © 2025 Aubry Cholleton
         </div>
       </footer>
     </div>

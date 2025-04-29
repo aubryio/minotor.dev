@@ -1,7 +1,8 @@
 'use client';
 import { StopId } from 'minotor';
-import { useStopsIndex } from './StopsIndexContext';
-import { FC, useEffect, useMemo, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
+import { promiseStopsIndexWorker } from './promiseStopsWorker';
+import { SimpleStop } from './stopsIndexWorker';
 
 const StopSearchField: FC<
   {
@@ -10,14 +11,21 @@ const StopSearchField: FC<
     onChange: (newStopsId: StopId) => void;
   } & Omit<React.HTMLAttributes<HTMLDivElement>, 'value' | 'onChange'>
 > = ({ placeholder = 'Search for a stop', value, onChange, ...divProps }) => {
-  const stopsIndex = useStopsIndex();
   const [searchValue, setSearchValue] = useState<string>('');
   const [isDropdownVisible, setIsDropdownVisible] = useState<boolean>(false);
+  const [searchResults, setSearchResults] = useState<SimpleStop[]>([]);
 
   useEffect(() => {
-    const stop = stopsIndex.findStopById(value);
-    setSearchValue(stop ? stop.name : '');
-  }, [stopsIndex, value]);
+    const fetchStop = async () => {
+      const stop = await promiseStopsIndexWorker.postMessage({
+        type: 'findStopById',
+        stopId: value,
+      });
+      setSearchValue(stop ? stop.name : '');
+    };
+
+    fetchStop();
+  }, [value]);
 
   const handleClickOutside = (event: MouseEvent) => {
     if ((event.target as Element).closest('.relative') === null) {
@@ -25,9 +33,17 @@ const StopSearchField: FC<
     }
   };
 
-  const searchResults = useMemo(() => {
-    return stopsIndex.findStopsByName(searchValue, 5);
-  }, [stopsIndex, searchValue]);
+  useEffect(() => {
+    const fetchStops = async () => {
+      const stops = await promiseStopsIndexWorker.postMessage({
+        type: 'findStopsByName',
+        query: searchValue,
+        maxResults: 5,
+      });
+      setSearchResults(stops);
+    };
+    fetchStops();
+  }, [searchValue]);
 
   useEffect(() => {
     document.addEventListener('mousedown', handleClickOutside);

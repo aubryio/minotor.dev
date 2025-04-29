@@ -1,6 +1,5 @@
 'use client';
 import { FC, Suspense, useState } from 'react';
-import { StopsIndexProvider } from '../stopSearch/StopsIndexContext';
 import StopSearchField from '../stopSearch/StopSearchField';
 import TimePicker from '../TimePicker';
 import { StopId } from 'minotor';
@@ -9,12 +8,13 @@ import {
   useIsochronesParamsDispatch,
 } from './IsochronesParamsContext';
 import { humanizeDuration } from '../utils';
+import { isIOS } from 'react-device-detect';
 
 const MIN_RESOLUTION = 500;
 const MAX_RESOLUTION = 6000;
 
 const MIN_DURATION = 60 * 10;
-const MAX_DURATION = 60 * 60 * 8;
+const MAX_DURATION = 60 * 60 * (isIOS ? 3 : 8);
 
 const IsochronesParamsForm: FC = () => {
   const dispatch = useIsochronesParamsDispatch();
@@ -36,22 +36,20 @@ const IsochronesParamsForm: FC = () => {
     <div>
       <div className="flex flex-col items-center justify-between space-y-2 sm:flex-row sm:items-center sm:space-x-2 sm:space-y-0">
         <Suspense fallback={fallbackSkeleton}>
-          <StopsIndexProvider>
-            <label htmlFor="origin" className="self-center">
-              From
-            </label>
-            <StopSearchField
-              value={isochronesParams.origin}
-              onChange={(stop: StopId) => {
-                dispatch({
-                  type: 'set_origin',
-                  origin: stop,
-                });
-              }}
-              placeholder="Origin"
-              id="origin"
-            />
-          </StopsIndexProvider>
+          <label htmlFor="origin" className="self-center">
+            From
+          </label>
+          <StopSearchField
+            value={isochronesParams.origin}
+            onChange={(stop: StopId) => {
+              dispatch({
+                type: 'set_origin',
+                origin: stop,
+              });
+            }}
+            placeholder="Origin"
+            id="origin"
+          />
         </Suspense>
         <label htmlFor="time" className="self-center">
           at
