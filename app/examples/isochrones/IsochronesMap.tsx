@@ -241,9 +241,10 @@ const IsochronesMap: FC = () => {
   const layers = useMemo(
     () => [
       new ContourLayer<ArrivalTime>({
-        id: 'ContourLayer',
-        //isochronesParams.departureTime.getMilliseconds() +
-        //isochronesParams.origin,
+        id:
+          'ContourLayer' +
+          isochronesParams.departureTime.getMilliseconds() +
+          isochronesParams.origin,
         data: filteredArrivals,
         aggregation: 'MIN',
         cellSize: isochronesParams.cellSize,
@@ -289,7 +290,14 @@ const IsochronesMap: FC = () => {
         },
       }),
     ],
-    [filteredArrivals, isochronesParams.cellSize, marker, updatePin],
+    [
+      filteredArrivals,
+      isochronesParams.cellSize,
+      isochronesParams.origin,
+      isochronesParams.departureTime,
+      marker,
+      updatePin,
+    ],
   );
 
   return (
