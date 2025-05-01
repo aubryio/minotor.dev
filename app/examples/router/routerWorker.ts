@@ -79,6 +79,7 @@ type ArrivalsResolutionParams = {
   origin: StopId;
   departureTime: Date;
   maxTransfers: number;
+  maxDuration: number;
 };
 
 type RoutingParams = {
@@ -91,7 +92,7 @@ type RoutingParams = {
 
 const resolveArrivals = async (
   searchParams: ArrivalsResolutionParams,
-): Promise<ArrayBuffer> => {
+): Promise<{ src: Float32Array; length: number }> => {
   const { router, stopsIndex } = await getRouter();
   const query = new Query.Builder()
     .from(searchParams.origin)
@@ -105,8 +106,6 @@ const resolveArrivals = async (
     queryCache.setValue(key, result);
   }
   const startTimestamp = Time.fromDate(searchParams.departureTime).toSeconds();
-  const bytesPerArrival = 12;
-
   const filteredArrivals = Array.from(result.earliestArrivals)
     .filter(([stopId]) => {
       const stop = stopsIndex.findStopById(stopId);
@@ -114,25 +113,23 @@ const resolveArrivals = async (
     })
     .filter(
       (entry) =>
-        entry[1].time.toSeconds() - startTimestamp < 60 * 60 * (isIOS ? 4 : 8),
+        entry[1].time.toSeconds() - startTimestamp < searchParams.maxDuration,
     );
 
-  const buffer = new ArrayBuffer(filteredArrivals.length * bytesPerArrival);
-  const view = new DataView(buffer);
-
+  const floatArray = new Float32Array(filteredArrivals.length * 3);
   let offset = 0;
   filteredArrivals.forEach(([stopId, reachingTime]: [StopId, ReachingTime]) => {
     const stop = stopsIndex.findStopById(stopId)!;
     const position = [stop.lon ?? 0, stop.lat ?? 0] as [number, number];
     const duration = reachingTime.time.toSeconds() - startTimestamp;
 
-    view.setFloat32(offset, position[0], true); // lon
-    view.setFloat32(offset + 4, position[1], true); // lat
-    view.setFloat32(offset + 8, duration, true); // duration
-    offset += bytesPerArrival;
+    floatArray[offset] = position[0]; // lon
+    floatArray[offset + 1] = position[1]; // lat
+    floatArray[offset + 2] = duration; // duration
+    offset += 3;
   });
 
-  return buffer;
+  return { src: floatArray, length: filteredArrivals.length };
 };
 
 const resolveRoute = async (

@@ -22,11 +22,6 @@ import { promiseRouterWorker } from '../router/promiseRouterWorker';
 const mapStyle = 'mapbox://styles/aubry/cm7jpifn600ql01r302tdhig2';
 const mapboxAccessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
-type ArrivalTime = {
-  duration: number;
-  position: [number, number];
-};
-
 export const BANDS: ContourLayerProps['contours'] = [
   {
     threshold: [0, 60 * 10],
@@ -144,28 +139,17 @@ export const BANDS: ContourLayerProps['contours'] = [
   },
 ];
 
-const parseArrayBuffer = (buffer: ArrayBuffer): ArrivalTime[] => {
-  const view = new DataView(buffer);
-  const arrivals: ArrivalTime[] = [];
-  const bytesPerArrival = 12;
-
-  for (let offset = 0; offset < view.byteLength; offset += bytesPerArrival) {
-    arrivals.push({
-      position: [
-        view.getFloat32(offset, true), // lon
-        view.getFloat32(offset + 4, true), // lat
-      ],
-      duration: view.getFloat32(offset + 8, true), // duration
-    });
-  }
-  return arrivals;
-};
-
 type Marker = { latitude: number; longitude: number };
 const IsochronesMap: FC = () => {
   const isochronesParams = useIsochronesParams();
   const dispatch = useIsochronesParamsDispatch();
-  const [earliestArrivals, setEarliestArrivals] = useState<ArrivalTime[]>([]);
+  const [earliestArrivals, setEarliestArrivals] = useState<
+    | {
+        src: Float32Array;
+        length: number;
+      }
+    | undefined
+  >(undefined);
   const [marker, setMarker] = useState<Marker | undefined>();
   const [isDragging, setIsDragging] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -193,15 +177,17 @@ const IsochronesMap: FC = () => {
         type: 'arrivalsResolution',
         origin: isochronesParams.origin,
         departureTime: isochronesParams.departureTime,
+        maxDuration: isochronesParams.maxDuration,
       });
       setLoading(false);
-      setEarliestArrivals(parseArrayBuffer(arrivals));
+      setEarliestArrivals(arrivals);
     };
     setLoading(true);
     fetchEarliestArrivals();
   }, [
     isochronesParams.departureTime,
     isochronesParams.origin,
+    isochronesParams.maxDuration,
     setEarliestArrivals,
   ]);
   const getTooltip = useCallback(({ object }: ContourLayerPickingInfo) => {
@@ -248,30 +234,25 @@ const IsochronesMap: FC = () => {
     },
     [dispatch],
   );
-  const filteredArrivals = useMemo(
-    () =>
-      earliestArrivals.filter(
-        (arrival) => arrival.duration <= isochronesParams.maxDuration,
-      ),
-    [earliestArrivals, isochronesParams.maxDuration],
-  );
   const layers = useMemo(
     () => [
-      new ContourLayer<ArrivalTime>({
-        id:
-          'ContourLayer' +
-          isochronesParams.departureTime.getMilliseconds() +
-          isochronesParams.origin,
-        data: filteredArrivals,
+      new ContourLayer<{ src: Float32Array; length: number }>({
+        id: 'ContourLayer',
+        data: earliestArrivals,
         aggregation: 'MIN',
         cellSize: isochronesParams.cellSize,
         contours: BANDS,
         opacity: 0.4,
-        getPosition: (d: ArrivalTime) => {
-          return d.position;
+        getPosition: (_, { index, data, target }) => {
+          target[0] = (data as unknown as { src: Float32Array }).src[index * 3];
+          target[1] = (data as unknown as { src: Float32Array }).src[
+            index * 3 + 1
+          ];
+          target[2] = 0;
+          return target as [number, number, number];
         },
-        getWeight: (d: ArrivalTime) => {
-          return d.duration;
+        getWeight: (_, { index, data }) => {
+          return (data as unknown as { src: Float32Array }).src[index * 3 + 2];
         },
         pickable: true,
         gpuAggregation: false,
@@ -307,14 +288,7 @@ const IsochronesMap: FC = () => {
         },
       }),
     ],
-    [
-      filteredArrivals,
-      isochronesParams.cellSize,
-      isochronesParams.origin,
-      isochronesParams.departureTime,
-      marker,
-      updatePin,
-    ],
+    [earliestArrivals, isochronesParams.cellSize, marker, updatePin],
   );
 
   return (
