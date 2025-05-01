@@ -8,7 +8,6 @@ import DeckGL from '@deck.gl/react';
 import {
   ContourLayer,
   ContourLayerPickingInfo,
-  ContourLayerProps,
 } from '@deck.gl/aggregation-layers';
 import type { PickingInfo } from '@deck.gl/core';
 import Map from 'react-map-gl/mapbox';
@@ -19,125 +18,9 @@ import { humanizeDuration } from '../utils';
 import { isIOS } from 'react-device-detect';
 import { promiseStopsIndexWorker } from '../stopSearch/promiseStopsWorker';
 import { promiseRouterWorker } from '../router/promiseRouterWorker';
+import BANDS from './colors';
 const mapStyle = 'mapbox://styles/aubry/cm7jpifn600ql01r302tdhig2';
 const mapboxAccessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
-
-export const BANDS: ContourLayerProps['contours'] = [
-  {
-    threshold: [0, 60 * 10],
-    color: [0, 255, 51, 255],
-    zIndex: 1,
-    strokeWidth: 0,
-  },
-  {
-    threshold: [60 * 10, 60 * 20],
-    color: [0, 255, 102, 245],
-    zIndex: 2,
-    strokeWidth: 0,
-  },
-  {
-    threshold: [60 * 20, 60 * 30],
-    color: [0, 255, 153, 235],
-    zIndex: 3,
-    strokeWidth: 0,
-  },
-  {
-    threshold: [60 * 30, 60 * 40],
-    color: [0, 255, 204, 225],
-    zIndex: 4,
-    strokeWidth: 0,
-  },
-  {
-    threshold: [60 * 40, 60 * 50],
-    color: [0, 255, 255, 215],
-    zIndex: 5,
-    strokeWidth: 0,
-  },
-  {
-    threshold: [60 * 50, 60 * 60],
-    color: [0, 228, 255, 205],
-    zIndex: 6,
-    strokeWidth: 0,
-  },
-  {
-    threshold: [60 * 60, 60 * 60 + 60 * 15],
-    color: [0, 171, 255, 195],
-    zIndex: 7,
-    strokeWidth: 0,
-  },
-  {
-    threshold: [60 * 60 + 60 * 15, 60 * 60 + 60 * 30],
-    color: [0, 114, 255, 185],
-    zIndex: 8,
-    strokeWidth: 0,
-  },
-  {
-    threshold: [60 * 60 + 60 * 30, 60 * 60 + 60 * 45],
-    color: [0, 58, 255, 175],
-    zIndex: 9,
-    strokeWidth: 0,
-  },
-  {
-    threshold: [60 * 60 + 60 * 45, 60 * 60 * 2],
-    color: [153, 0, 255, 165],
-    zIndex: 10,
-    strokeWidth: 0,
-  },
-  {
-    threshold: [60 * 60 * 2, 60 * 60 * 2 + 60 * 20],
-    color: [204, 0, 255, 155],
-    zIndex: 11,
-    strokeWidth: 0,
-  },
-  {
-    threshold: [60 * 60 * 2 + 60 * 20, 60 * 60 * 2 + 60 * 40],
-    color: [255, 0, 255, 145],
-    zIndex: 12,
-    strokeWidth: 0,
-  },
-  {
-    threshold: [60 * 60 * 2 + 60 * 40, 60 * 60 * 3],
-    color: [255, 0, 224, 135],
-    zIndex: 13,
-    strokeWidth: 0,
-  },
-  {
-    threshold: [60 * 60 * 3, 60 * 60 * 3 + 60 * 30],
-    color: [255, 0, 195, 125],
-    zIndex: 14,
-    strokeWidth: 0,
-  },
-  {
-    threshold: [60 * 60 * 3 + 60 * 30, 60 * 60 * 4],
-    color: [255, 0, 165, 115],
-    zIndex: 15,
-    strokeWidth: 0,
-  },
-  {
-    threshold: [60 * 60 * 4, 60 * 60 * 4 + 60 * 30],
-    color: [255, 0, 137, 105],
-    zIndex: 16,
-    strokeWidth: 0,
-  },
-  {
-    threshold: [60 * 60 * 4 + 60 * 30, 60 * 60 * 5],
-    color: [255, 0, 100, 95],
-    zIndex: 16,
-    strokeWidth: 0,
-  },
-  {
-    threshold: [60 * 60 * 5, 60 * 60 * 6],
-    color: [255, 0, 80, 85],
-    zIndex: 16,
-    strokeWidth: 0,
-  },
-  {
-    threshold: [60 * 60 * 6, 60 * 60 * 8],
-    color: [255, 0, 60, 75],
-    zIndex: 16,
-    strokeWidth: 0,
-  },
-];
 
 type Marker = { latitude: number; longitude: number };
 const IsochronesMap: FC = () => {
@@ -237,7 +120,7 @@ const IsochronesMap: FC = () => {
   const layers = useMemo(
     () => [
       new ContourLayer<{ src: Float32Array; length: number }>({
-        id: 'ContourLayer',
+        id: `ContourLayer_${isochronesParams.departureTime.getTime()}_${isochronesParams.origin}_${isochronesParams.maxDuration}`,
         data: earliestArrivals,
         aggregation: 'MIN',
         cellSize: isochronesParams.cellSize,
@@ -288,7 +171,15 @@ const IsochronesMap: FC = () => {
         },
       }),
     ],
-    [earliestArrivals, isochronesParams.cellSize, marker, updatePin],
+    [
+      earliestArrivals,
+      isochronesParams.cellSize,
+      isochronesParams.departureTime,
+      isochronesParams.maxDuration,
+      isochronesParams.origin,
+      marker,
+      updatePin,
+    ],
   );
 
   return (
