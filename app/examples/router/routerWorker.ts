@@ -6,13 +6,10 @@ import {
   Time,
   StopId,
   ReachingTime,
-  Result,
   Route,
 } from 'minotor';
 import { fetchCompressedData } from '../utils';
 import registerPromiseWorker from 'promise-worker/register';
-import { WeakLRUCache } from 'weak-lru-cache';
-import { isIOS } from 'react-device-detect';
 
 let cachedRouter:
   | {
@@ -27,14 +24,6 @@ let cachedRouter:
         stopsIndex: StopsIndex;
       }>;
     };
-
-type QueryKey = string;
-const queryCache = new WeakLRUCache<QueryKey, Result>({
-  cacheSize: isIOS ? 1 : 20,
-});
-const queryKey = (query: Query): QueryKey => {
-  return `${query.departureTime}-${query.from}-${query.options.maxTransfers}-${query.to.join(',')}`;
-};
 
 async function initialize(): Promise<{
   router: Router;
@@ -99,12 +88,7 @@ const resolveArrivals = async (
     .departureTime(Time.fromDate(searchParams.departureTime))
     .maxTransfers(5)
     .build();
-  const key = queryKey(query);
-  let result = queryCache.getValue(key);
-  if (!result) {
-    result = router.route(query);
-    queryCache.setValue(key, result);
-  }
+  const result = router.route(query);
   const startTimestamp = Time.fromDate(searchParams.departureTime).toSeconds();
   const filteredArrivals = Array.from(result.earliestArrivals)
     .filter(([stopId]) => {
@@ -114,7 +98,8 @@ const resolveArrivals = async (
     .filter(
       (entry) =>
         entry[1].time.toSeconds() - startTimestamp < searchParams.maxDuration,
-    );
+    )
+    .filter(([stopId]) => !stopId.startsWith('Parent'));
 
   const floatArray = new Float32Array(filteredArrivals.length * 3);
   let offset = 0;
@@ -139,15 +124,10 @@ const resolveRoute = async (
     .from(searchParams.origin)
     .to(searchParams.destination)
     .departureTime(Time.fromDate(searchParams.departureTime))
-    .maxTransfers(isIOS ? 4 : 5)
+    .maxTransfers(4)
     .build();
-  const key = queryKey(query);
-  let result = queryCache.getValue(key);
-  if (!result) {
-    const { router } = await getRouter();
-    result = router.route(query);
-    queryCache.setValue(key, result);
-  }
+  const { router } = await getRouter();
+  const result = router.route(query);
   return result.bestRoute(searchParams.destination);
 };
 
