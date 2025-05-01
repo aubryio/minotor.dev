@@ -8,7 +8,6 @@ import DeckGL from '@deck.gl/react';
 import {
   ContourLayer,
   ContourLayerPickingInfo,
-  ContourLayerProps,
 } from '@deck.gl/aggregation-layers';
 import type { PickingInfo } from '@deck.gl/core';
 import Map from 'react-map-gl/mapbox';
@@ -19,153 +18,21 @@ import { humanizeDuration } from '../utils';
 import { isIOS } from 'react-device-detect';
 import { promiseStopsIndexWorker } from '../stopSearch/promiseStopsWorker';
 import { promiseRouterWorker } from '../router/promiseRouterWorker';
+import BANDS from './colors';
 const mapStyle = 'mapbox://styles/aubry/cm7jpifn600ql01r302tdhig2';
 const mapboxAccessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
-
-type ArrivalTime = {
-  duration: number;
-  position: [number, number];
-};
-
-export const BANDS: ContourLayerProps['contours'] = [
-  {
-    threshold: [0, 60 * 10],
-    color: [0, 255, 51, 255],
-    zIndex: 1,
-    strokeWidth: 0,
-  },
-  {
-    threshold: [60 * 10, 60 * 20],
-    color: [0, 255, 102, 245],
-    zIndex: 2,
-    strokeWidth: 0,
-  },
-  {
-    threshold: [60 * 20, 60 * 30],
-    color: [0, 255, 153, 235],
-    zIndex: 3,
-    strokeWidth: 0,
-  },
-  {
-    threshold: [60 * 30, 60 * 40],
-    color: [0, 255, 204, 225],
-    zIndex: 4,
-    strokeWidth: 0,
-  },
-  {
-    threshold: [60 * 40, 60 * 50],
-    color: [0, 255, 255, 215],
-    zIndex: 5,
-    strokeWidth: 0,
-  },
-  {
-    threshold: [60 * 50, 60 * 60],
-    color: [0, 228, 255, 205],
-    zIndex: 6,
-    strokeWidth: 0,
-  },
-  {
-    threshold: [60 * 60, 60 * 60 + 60 * 15],
-    color: [0, 171, 255, 195],
-    zIndex: 7,
-    strokeWidth: 0,
-  },
-  {
-    threshold: [60 * 60 + 60 * 15, 60 * 60 + 60 * 30],
-    color: [0, 114, 255, 185],
-    zIndex: 8,
-    strokeWidth: 0,
-  },
-  {
-    threshold: [60 * 60 + 60 * 30, 60 * 60 + 60 * 45],
-    color: [0, 58, 255, 175],
-    zIndex: 9,
-    strokeWidth: 0,
-  },
-  {
-    threshold: [60 * 60 + 60 * 45, 60 * 60 * 2],
-    color: [153, 0, 255, 165],
-    zIndex: 10,
-    strokeWidth: 0,
-  },
-  {
-    threshold: [60 * 60 * 2, 60 * 60 * 2 + 60 * 20],
-    color: [204, 0, 255, 155],
-    zIndex: 11,
-    strokeWidth: 0,
-  },
-  {
-    threshold: [60 * 60 * 2 + 60 * 20, 60 * 60 * 2 + 60 * 40],
-    color: [255, 0, 255, 145],
-    zIndex: 12,
-    strokeWidth: 0,
-  },
-  {
-    threshold: [60 * 60 * 2 + 60 * 40, 60 * 60 * 3],
-    color: [255, 0, 224, 135],
-    zIndex: 13,
-    strokeWidth: 0,
-  },
-  {
-    threshold: [60 * 60 * 3, 60 * 60 * 3 + 60 * 30],
-    color: [255, 0, 195, 125],
-    zIndex: 14,
-    strokeWidth: 0,
-  },
-  {
-    threshold: [60 * 60 * 3 + 60 * 30, 60 * 60 * 4],
-    color: [255, 0, 165, 115],
-    zIndex: 15,
-    strokeWidth: 0,
-  },
-  {
-    threshold: [60 * 60 * 4, 60 * 60 * 4 + 60 * 30],
-    color: [255, 0, 137, 105],
-    zIndex: 16,
-    strokeWidth: 0,
-  },
-  {
-    threshold: [60 * 60 * 4 + 60 * 30, 60 * 60 * 5],
-    color: [255, 0, 100, 95],
-    zIndex: 16,
-    strokeWidth: 0,
-  },
-  {
-    threshold: [60 * 60 * 5, 60 * 60 * 6],
-    color: [255, 0, 80, 85],
-    zIndex: 16,
-    strokeWidth: 0,
-  },
-  {
-    threshold: [60 * 60 * 6, 60 * 60 * 8],
-    color: [255, 0, 60, 75],
-    zIndex: 16,
-    strokeWidth: 0,
-  },
-];
-
-const parseArrayBuffer = (buffer: ArrayBuffer): ArrivalTime[] => {
-  const view = new DataView(buffer);
-  const arrivals: ArrivalTime[] = [];
-  const bytesPerArrival = 12;
-
-  for (let offset = 0; offset < view.byteLength; offset += bytesPerArrival) {
-    arrivals.push({
-      position: [
-        view.getFloat32(offset, true), // lon
-        view.getFloat32(offset + 4, true), // lat
-      ],
-      duration: view.getFloat32(offset + 8, true), // duration
-    });
-  }
-  return arrivals;
-};
 
 type Marker = { latitude: number; longitude: number };
 const IsochronesMap: FC = () => {
   const isochronesParams = useIsochronesParams();
   const dispatch = useIsochronesParamsDispatch();
-  const [earliestArrivals, setEarliestArrivals] = useState<ArrivalTime[]>([]);
+  const [earliestArrivals, setEarliestArrivals] = useState<
+    | {
+        src: Float32Array;
+        length: number;
+      }
+    | undefined
+  >(undefined);
   const [marker, setMarker] = useState<Marker | undefined>();
   const [isDragging, setIsDragging] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -193,15 +60,17 @@ const IsochronesMap: FC = () => {
         type: 'arrivalsResolution',
         origin: isochronesParams.origin,
         departureTime: isochronesParams.departureTime,
+        maxDuration: isochronesParams.maxDuration,
       });
       setLoading(false);
-      setEarliestArrivals(parseArrayBuffer(arrivals));
+      setEarliestArrivals(arrivals);
     };
     setLoading(true);
     fetchEarliestArrivals();
   }, [
     isochronesParams.departureTime,
     isochronesParams.origin,
+    isochronesParams.maxDuration,
     setEarliestArrivals,
   ]);
   const getTooltip = useCallback(({ object }: ContourLayerPickingInfo) => {
@@ -248,30 +117,25 @@ const IsochronesMap: FC = () => {
     },
     [dispatch],
   );
-  const filteredArrivals = useMemo(
-    () =>
-      earliestArrivals.filter(
-        (arrival) => arrival.duration <= isochronesParams.maxDuration,
-      ),
-    [earliestArrivals, isochronesParams.maxDuration],
-  );
   const layers = useMemo(
     () => [
-      new ContourLayer<ArrivalTime>({
-        id:
-          'ContourLayer' +
-          isochronesParams.departureTime.getMilliseconds() +
-          isochronesParams.origin,
-        data: filteredArrivals,
+      new ContourLayer<{ src: Float32Array; length: number }>({
+        id: `ContourLayer_${isochronesParams.departureTime.getTime()}_${isochronesParams.origin}_${isochronesParams.maxDuration}`,
+        data: earliestArrivals,
         aggregation: 'MIN',
         cellSize: isochronesParams.cellSize,
         contours: BANDS,
         opacity: 0.4,
-        getPosition: (d: ArrivalTime) => {
-          return d.position;
+        getPosition: (_, { index, data, target }) => {
+          target[0] = (data as unknown as { src: Float32Array }).src[index * 3];
+          target[1] = (data as unknown as { src: Float32Array }).src[
+            index * 3 + 1
+          ];
+          target[2] = 0;
+          return target as [number, number, number];
         },
-        getWeight: (d: ArrivalTime) => {
-          return d.duration;
+        getWeight: (_, { index, data }) => {
+          return (data as unknown as { src: Float32Array }).src[index * 3 + 2];
         },
         pickable: true,
         gpuAggregation: false,
@@ -308,10 +172,11 @@ const IsochronesMap: FC = () => {
       }),
     ],
     [
-      filteredArrivals,
+      earliestArrivals,
       isochronesParams.cellSize,
-      isochronesParams.origin,
       isochronesParams.departureTime,
+      isochronesParams.maxDuration,
+      isochronesParams.origin,
       marker,
       updatePin,
     ],

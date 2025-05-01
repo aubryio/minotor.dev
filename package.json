@@ -54,8 +54,7 @@
     "react-icons": "^5.4.0",
     "react-map-gl": "^8.0.1",
     "rehype-pretty-code": "^0.14.0",
-    "shiki": "^1.29.2",
-    "weak-lru-cache": "^1.2.2"
+    "shiki": "^1.29.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
