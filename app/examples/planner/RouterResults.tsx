@@ -6,8 +6,8 @@ import {
   Leg,
   Route,
   ServiceRoute,
+  SourceStopId,
   Stop,
-  StopId,
   Time,
   Transfer,
   TransferType,
@@ -20,8 +20,8 @@ import { suspensify } from '../utils';
 import { promiseRouterWorker } from '../router/promiseRouterWorker';
 
 type SearchParams = {
-  origin: StopId;
-  destination: StopId;
+  origin: SourceStopId;
+  destination: SourceStopId;
   departureTime: Date;
 };
 type SerializedDuration = { totalSeconds: number };

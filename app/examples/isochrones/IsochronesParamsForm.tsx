@@ -2,7 +2,7 @@
 import { FC, Suspense, useState } from 'react';
 import StopSearchField from '../stopSearch/StopSearchField';
 import TimePicker from '../TimePicker';
-import { StopId } from 'minotor';
+import { SourceStopId } from 'minotor';
 import {
   useIsochronesParams,
   useIsochronesParamsDispatch,
@@ -41,7 +41,7 @@ const IsochronesParamsForm: FC = () => {
           </label>
           <StopSearchField
             value={isochronesParams.origin}
-            onChange={(stop: StopId) => {
+            onChange={(stop: SourceStopId) => {
               dispatch({
                 type: 'set_origin',
                 origin: stop,

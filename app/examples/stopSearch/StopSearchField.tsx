@@ -1,5 +1,5 @@
 'use client';
-import { StopId } from 'minotor';
+import { SourceStopId } from 'minotor';
 import { FC, useEffect, useState } from 'react';
 import { promiseStopsIndexWorker } from './promiseStopsWorker';
 import { SimpleStop } from './stopsIndexWorker';
@@ -7,8 +7,8 @@ import { SimpleStop } from './stopsIndexWorker';
 const StopSearchField: FC<
   {
     placeholder?: string;
-    value: StopId;
-    onChange: (newStopsId: StopId) => void;
+    value: SourceStopId;
+    onChange: (newStopsId: SourceStopId) => void;
   } & Omit<React.HTMLAttributes<HTMLDivElement>, 'value' | 'onChange'>
 > = ({ placeholder = 'Search for a stop', value, onChange, ...divProps }) => {
   const [searchValue, setSearchValue] = useState<string>('');
@@ -18,7 +18,7 @@ const StopSearchField: FC<
   useEffect(() => {
     const fetchStop = async () => {
       const stop = await promiseStopsIndexWorker.postMessage({
-        type: 'findStopById',
+        type: 'findStopBySourceId',
         stopId: value,
       });
       setSearchValue(stop ? stop.name : '');
@@ -55,7 +55,7 @@ const StopSearchField: FC<
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && searchResults.length > 0) {
       const firstResult = searchResults[0];
-      onChange(firstResult.id);
+      onChange(firstResult.sourceId);
       setSearchValue(firstResult.name);
       setIsDropdownVisible(false);
     }
@@ -78,9 +78,9 @@ const StopSearchField: FC<
         <ul className="absolute z-10 mt-2 max-h-40 w-full overflow-y-auto rounded-2xl border border-gray-300 bg-white px-1 py-1 text-black">
           {searchResults.map((stop) => (
             <li
-              key={stop.id}
+              key={stop.sourceId}
               onClick={() => {
-                onChange(stop.id);
+                onChange(stop.sourceId);
                 setSearchValue(stop.name);
                 setIsDropdownVisible(false);
               }}

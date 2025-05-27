@@ -185,7 +185,7 @@ const Home = () => {
               <p>
                 An example client-side transit router running in the browser
                 with a web worker. It uses the full data from the Swiss GTFS
-                feed for a day (Monday April 28th 2025) from{' '}
+                feed for a day (Monday May 27th 2025) from{' '}
                 <a
                   href="https://opentransportdata.swiss"
                   target="_blank"
@@ -196,7 +196,7 @@ const Home = () => {
                 </a>{' '}
                 , loaded in memory (thus works offline too). Check out{' '}
                 <a
-                  href="https://github.com/aubryio/minotor.dev/tree/main/app/examples/router"
+                  href="https://github.com/aubryio/minotor.dev/tree/main/app/examples/planner"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-accent hover:underline"
@@ -223,7 +223,7 @@ const Home = () => {
               <p>
                 An example isochrone map running in the browser with a web
                 worker. It uses the full data from the Swiss GTFS feed for a day
-                (Monday April 28th 2025) from{' '}
+                (Monday May 27th 2025) from{' '}
                 <a
                   href="https://opentransportdata.swiss"
                   target="_blank"
