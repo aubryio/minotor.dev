@@ -4,9 +4,10 @@ import {
   Timetable,
   Query,
   Time,
-  StopId,
   ReachingTime,
   Route,
+  SourceStopId,
+  StopId,
 } from 'minotor';
 import { fetchCompressedData } from '../utils';
 import registerPromiseWorker from 'promise-worker/register';
@@ -30,8 +31,8 @@ async function initialize(): Promise<{
   stopsIndex: StopsIndex;
 }> {
   const [timetableData, stopsIndexData] = await Promise.all([
-    fetchCompressedData('/2025-04-28_timetable.bin'),
-    fetchCompressedData('/2025-04-28_stops.bin'),
+    fetchCompressedData('/2025-05-27_timetable_2.bin'),
+    fetchCompressedData('/2025-05-27_stops_2.bin'),
   ]);
   const timetable = Timetable.fromData(timetableData);
   const stopsIndex = StopsIndex.fromData(stopsIndexData);
@@ -65,7 +66,7 @@ async function getRouter(): Promise<{
 
 type ArrivalsResolutionParams = {
   type: 'arrivalsResolution';
-  origin: StopId;
+  origin: SourceStopId;
   departureTime: Date;
   maxTransfers: number;
   maxDuration: number;
@@ -73,8 +74,8 @@ type ArrivalsResolutionParams = {
 
 type RoutingParams = {
   type: 'routing';
-  destination: StopId;
-  origin: StopId;
+  destination: SourceStopId;
+  origin: SourceStopId;
   departureTime: Date;
   maxTransfers: number;
 };
@@ -90,16 +91,10 @@ const resolveArrivals = async (
     .build();
   const result = router.route(query);
   const startTimestamp = Time.fromDate(searchParams.departureTime).toSeconds();
-  const filteredArrivals = Array.from(result.earliestArrivals)
-    .filter(([stopId]) => {
-      const stop = stopsIndex.findStopById(stopId);
-      return stop !== undefined;
-    })
-    .filter(
-      (entry) =>
-        entry[1].time.toSeconds() - startTimestamp < searchParams.maxDuration,
-    )
-    .filter(([stopId]) => !stopId.startsWith('Parent'));
+  const filteredArrivals = Array.from(result.earliestArrivals).filter(
+    (entry) =>
+      entry[1].time.toSeconds() - startTimestamp < searchParams.maxDuration,
+  );
 
   const floatArray = new Float32Array(filteredArrivals.length * 3);
   let offset = 0;

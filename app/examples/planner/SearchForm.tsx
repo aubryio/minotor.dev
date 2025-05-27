@@ -2,7 +2,7 @@
 import { FC, Suspense } from 'react';
 import StopSearchField from '../stopSearch/StopSearchField';
 import TimePicker from '../TimePicker';
-import { StopId } from 'minotor';
+import { SourceStopId } from 'minotor';
 import { useRouteSearch, useRouteSearchDispatch } from './RouteSearchContext';
 
 const SearchForm: FC = () => {
@@ -29,7 +29,7 @@ const SearchForm: FC = () => {
         </label>
         <StopSearchField
           value={routeSearch.origin}
-          onChange={(stop: StopId) => {
+          onChange={(stop: SourceStopId) => {
             dispatch({
               type: 'set_origin',
               origin: stop,

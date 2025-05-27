@@ -1,5 +1,5 @@
 'use client';
-import { StopId } from 'minotor';
+import { SourceStopId } from 'minotor';
 import { createContext, Dispatch, useContext, useReducer } from 'react';
 import { isIOS } from 'react-device-detect';
 
@@ -82,7 +82,7 @@ const isochronesParamsReducer = (
 };
 
 export type IsochronesParamsState = {
-  origin: StopId;
+  origin: SourceStopId;
   departureTime: Date;
   cellSize: number;
   maxDuration: number;
@@ -90,7 +90,7 @@ export type IsochronesParamsState = {
 };
 
 export type IsochronesParamsAction =
-  | { type: 'set_origin'; origin: StopId }
+  | { type: 'set_origin'; origin: SourceStopId }
   | { type: 'set_departure_time'; time: Date }
   | { type: 'set_cell_size'; cellSize: number }
   | { type: 'set_max_duration'; maxDuration: number };

@@ -40,7 +40,7 @@ const IsochronesMap: FC = () => {
   useEffect(() => {
     const fetchStop = async () => {
       const stop = await promiseStopsIndexWorker.postMessage({
-        type: 'findStopById',
+        type: 'findStopBySourceId',
         stopId: isochronesParams.origin,
       });
       if (!stop || !stop.lon || !stop.lat) {
@@ -107,7 +107,7 @@ const IsochronesMap: FC = () => {
           });
           dispatch({
             type: 'set_origin',
-            origin: stops[0].id,
+            origin: stops[0].sourceId,
           });
         }
       };
