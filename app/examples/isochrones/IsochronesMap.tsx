@@ -79,7 +79,7 @@ const IsochronesMap: FC = () => {
       Array.isArray(object.contour.threshold) &&
       object.contour.threshold.length >= 2
       ? {
-          html: `${humanizeDuration(object.contour.threshold[0], true)} to ${humanizeDuration(object.contour.threshold[1], true)} trip`,
+          html: `${humanizeDuration(object.contour.threshold[0] * 60, true)} to ${humanizeDuration(object.contour.threshold[1] * 60, true)} trip`,
           style: {
             backgroundColor: 'rgba(0, 0, 0, 0.8)',
             color: 'white',

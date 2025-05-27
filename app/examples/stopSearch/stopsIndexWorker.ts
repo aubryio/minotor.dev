@@ -17,7 +17,7 @@ let cachedIndex:
 async function initialize(): Promise<{
   stopsIndex: StopsIndex;
 }> {
-  const stopsIndexData = await fetchCompressedData('/2025-05-27_stops_2.bin');
+  const stopsIndexData = await fetchCompressedData('/2025-05-27_stops_3.bin');
   const stopsIndex = StopsIndex.fromData(stopsIndexData);
   const result = { stopsIndex: stopsIndex };
   return result;
