@@ -44,7 +44,7 @@
     "@vercel/analytics": "^1.5.0",
     "luxon": "^3.5.0",
     "mapbox-gl": "^3.10.0",
-    "minotor": "^2.0.1",
+    "minotor": "^3.0.0",
     "next": "^15.1.7",
     "promise-worker": "^2.0.1",
     "react": "^19.0.0",

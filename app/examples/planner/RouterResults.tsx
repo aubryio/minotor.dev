@@ -25,7 +25,7 @@ type SearchParams = {
   departureTime: Date;
 };
 type SerializedDuration = { totalSeconds: number };
-type SerializedTime = { secondsSinceMidnight: number };
+type SerializedTime = { minutesSinceMidnight: number };
 type SerializedRoute = {
   legs: SerializedLeg[];
 };
@@ -52,11 +52,11 @@ const convertSerializedRouteToRoute = (
     if ('route' in serializedLeg) {
       const vehicleLeg: VehicleLeg = {
         ...serializedLeg,
-        departureTime: Time.fromSeconds(
-          serializedLeg.departureTime.secondsSinceMidnight,
+        departureTime: Time.fromMinutes(
+          serializedLeg.departureTime.minutesSinceMidnight,
         ),
-        arrivalTime: Time.fromSeconds(
-          serializedLeg.arrivalTime.secondsSinceMidnight,
+        arrivalTime: Time.fromMinutes(
+          serializedLeg.arrivalTime.minutesSinceMidnight,
         ),
       };
       return vehicleLeg;
@@ -101,7 +101,7 @@ const RouterResults: FC = () => {
       return (
         <VehicleLegItem
           leg={leg}
-          key={`${leg.from.id}-${leg.to.id}-${leg.route.name}-${leg.departureTime.toSeconds()}`}
+          key={`${leg.from.id}-${leg.to.id}-${leg.route.name}-${leg.departureTime.toMinutes()}`}
         />
       );
     } else {

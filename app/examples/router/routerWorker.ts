@@ -31,8 +31,8 @@ async function initialize(): Promise<{
   stopsIndex: StopsIndex;
 }> {
   const [timetableData, stopsIndexData] = await Promise.all([
-    fetchCompressedData('/2025-05-27_timetable_2.bin'),
-    fetchCompressedData('/2025-05-27_stops_2.bin'),
+    fetchCompressedData('/2025-05-27_timetable_3.bin'),
+    fetchCompressedData('/2025-05-27_stops_3.bin'),
   ]);
   const timetable = Timetable.fromData(timetableData);
   const stopsIndex = StopsIndex.fromData(stopsIndexData);
@@ -90,10 +90,11 @@ const resolveArrivals = async (
     .maxTransfers(5)
     .build();
   const result = router.route(query);
-  const startTimestamp = Time.fromDate(searchParams.departureTime).toSeconds();
+  const startTimestamp = Time.fromDate(searchParams.departureTime).toMinutes();
   const filteredArrivals = Array.from(result.earliestArrivals).filter(
     (entry) =>
-      entry[1].time.toSeconds() - startTimestamp < searchParams.maxDuration,
+      entry[1].time.toMinutes() - startTimestamp <
+      searchParams.maxDuration / 60,
   );
 
   const floatArray = new Float32Array(filteredArrivals.length * 3);
@@ -101,11 +102,11 @@ const resolveArrivals = async (
   filteredArrivals.forEach(([stopId, reachingTime]: [StopId, ReachingTime]) => {
     const stop = stopsIndex.findStopById(stopId)!;
     const position = [stop.lon ?? 0, stop.lat ?? 0] as [number, number];
-    const duration = reachingTime.time.toSeconds() - startTimestamp;
+    const duration = reachingTime.time.toMinutes() - startTimestamp;
 
-    floatArray[offset] = position[0]; // lon
-    floatArray[offset + 1] = position[1]; // lat
-    floatArray[offset + 2] = duration; // duration
+    floatArray[offset] = position[0];
+    floatArray[offset + 1] = position[1];
+    floatArray[offset + 2] = duration;
     offset += 3;
   });
 
