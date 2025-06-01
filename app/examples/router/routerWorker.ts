@@ -4,10 +4,8 @@ import {
   Timetable,
   Query,
   Time,
-  ReachingTime,
   Route,
   SourceStopId,
-  StopId,
 } from 'minotor';
 import { fetchCompressedData } from '../utils';
 import registerPromiseWorker from 'promise-worker/register';
@@ -91,26 +89,32 @@ const resolveArrivals = async (
     .build();
   const result = router.route(query);
   const startTimestamp = Time.fromDate(searchParams.departureTime).toMinutes();
-  const filteredArrivals = Array.from(result.earliestArrivals).filter(
-    (entry) =>
+
+  let nbArrivals = 0;
+  for (const entry of result.earliestArrivals) {
+    if (
       entry[1].time.toMinutes() - startTimestamp <
-      searchParams.maxDuration / 60,
-  );
+      searchParams.maxDuration / 60
+    ) {
+      nbArrivals++;
+    }
+  }
 
-  const floatArray = new Float32Array(filteredArrivals.length * 3);
+  const floatArray = new Float32Array(nbArrivals * 3);
   let offset = 0;
-  filteredArrivals.forEach(([stopId, reachingTime]: [StopId, ReachingTime]) => {
-    const stop = stopsIndex.findStopById(stopId)!;
-    const position = [stop.lon ?? 0, stop.lat ?? 0] as [number, number];
+  for (const [stopId, reachingTime] of result.earliestArrivals) {
     const duration = reachingTime.time.toMinutes() - startTimestamp;
+    if (duration < searchParams.maxDuration / 60) {
+      const stop = stopsIndex.findStopById(stopId)!;
+      const position = [stop.lon ?? 0, stop.lat ?? 0] as [number, number];
 
-    floatArray[offset] = position[0];
-    floatArray[offset + 1] = position[1];
-    floatArray[offset + 2] = duration;
-    offset += 3;
-  });
-
-  return { src: floatArray, length: filteredArrivals.length };
+      floatArray[offset] = position[0];
+      floatArray[offset + 1] = position[1];
+      floatArray[offset + 2] = duration;
+      offset += 3;
+    }
+  }
+  return { src: floatArray, length: nbArrivals };
 };
 
 const resolveRoute = async (
