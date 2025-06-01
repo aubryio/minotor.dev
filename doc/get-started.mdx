@@ -52,7 +52,7 @@ const destinations = stopsIndex.findStopsByName('Moles');
 Query stops by ID:
 
 ```typescript
-const stopFromId = stopsIndex.findStopById('8592374:0:A');
+const stopFromId = stopsIndex.findStopBySourceId('8592374:0:A');
 ```
 
 Or by location (e.g. find the 5 closest stops within 500m):
@@ -127,3 +127,7 @@ Query routes (`minotor> .route -h for more options`):
 ```bash
 minotor> .route from fribourg to moleson at 08:00
 ```
+
+### Routing algorithm
+
+Minotor routing algorithm is mostly based on RAPTOR. See [Round-Based Public Transit Routing, D. Delling et al. 2012](https://www.microsoft.com/en-us/research/wp-content/uploads/2012/01/raptor_alenex.pdf).

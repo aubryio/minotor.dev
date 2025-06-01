@@ -245,6 +245,19 @@ const Home = () => {
                 </a>
                 .
               </p>
+              <p>
+                A more complete isochrone map showcase relying on minotor can be
+                found on{' '}
+                <a
+                  href="https://isochrone.ch"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-accent hover:underline"
+                >
+                  isochrone.ch
+                </a>
+                .
+              </p>
             </>
           )}
         </section>
