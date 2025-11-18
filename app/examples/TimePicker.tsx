@@ -37,7 +37,7 @@ const TimePicker: FC<
     <input
       type="time"
       id="time"
-      className="w-max-30 rounded-full border bg-white px-4 py-2 text-black focus:bg-[#f6f6f6] focus:outline-none"
+      className="w-max-30 rounded-full border bg-white px-4 py-2 text-black focus:bg-[#f6f6f6] focus:outline-hidden"
       value={internalValue}
       onChange={handleChange}
       required

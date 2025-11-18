@@ -14,7 +14,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     ),
     code: ({ children }) => (
       <code
-        className="font-[family-name:var(--font-dm-mono)] text-sm"
+        className="font-(family-name:--font-dm-mono) text-sm"
         style={{
           whiteSpace: 'pre-line',
           wordWrap: 'break-word',

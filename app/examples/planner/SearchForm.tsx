@@ -10,7 +10,7 @@ const SearchForm: FC = () => {
   const routeSearch = useRouteSearch();
 
   const fallbackSkeleton = (
-    <div className="flex flex-col items-center justify-between space-y-2 sm:flex-row sm:items-center sm:space-x-2 sm:space-y-0">
+    <div className="flex flex-col items-center justify-between space-y-2 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-2">
       <label htmlFor="origin" className="self-center">
         From
       </label>
@@ -22,7 +22,7 @@ const SearchForm: FC = () => {
     </div>
   );
   return (
-    <div className="flex flex-col items-center justify-between space-y-2 sm:flex-row sm:items-center sm:space-x-2 sm:space-y-0">
+    <div className="flex flex-col items-center justify-between space-y-2 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-2">
       <Suspense fallback={fallbackSkeleton}>
         <label htmlFor="origin" className="self-center">
           From

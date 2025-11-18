@@ -62,15 +62,15 @@ const Home = () => {
     },
   );
   return (
-    <div className="grid min-h-screen grid-rows-[20px_1fr_20px] items-center justify-items-center gap-16 p-8 pb-20 font-[family-name:var(--font-hanken-sans)] sm:p-20">
-      <main className="row-start-2 flex max-w-screen-md flex-col items-center gap-8 gap-y-4 sm:items-start">
+    <div className="grid min-h-screen grid-rows-[20px_1fr_20px] items-center justify-items-center gap-16 p-8 pb-20 font-(family-name:--font-hanken-sans) sm:p-20">
+      <main className="row-start-2 flex max-w-(--breakpoint-md) flex-col items-center gap-8 gap-y-4 sm:items-start">
         <h1 className="text-4xl font-bold sm:text-5xl">
           m<span className="text-accent">i</span>notor
         </h1>
         <h2 className="text-xl sm:text-2xl">
           A public transit routing library built for{' '}
-          <span className="inline-flex h-[calc(theme(fontSize.xl)*theme(lineHeight.tight))] flex-col overflow-hidden text-accent sm:h-[calc(theme(fontSize.2xl)*theme(lineHeight.tight))]">
-            <ul className="block animate-text-slide text-left leading-tight [&_li]:block">
+          <span className="text-accent inline-flex h-[calc(var(--text-xl)*(var(--leading-tight)))] flex-col overflow-hidden sm:h-[calc(var(--text-2xl)*(var(--leading-tight)))]">
+            <ul className="animate-text-slide block text-left leading-tight [&_li]:block">
               <li>data viz.</li>
               <li>research.</li>
               <li>privacy.</li>
@@ -92,7 +92,7 @@ const Home = () => {
           </p>
         </section>
         <div className="flex flex-col items-center gap-4 pt-4 sm:flex-row">
-          <code className="flex items-center rounded-full border-2 border-accent bg-black px-7 py-4 font-[family-name:var(--font-dm-mono)] text-sm tracking-tight text-white">
+          <code className="border-accent flex items-center rounded-full border-2 bg-black px-7 py-4 font-(family-name:--font-dm-mono) text-sm tracking-tight text-white">
             npm i minotor
             <button
               onClick={() => navigator.clipboard.writeText('npm i minotor')}
@@ -129,12 +129,12 @@ const Home = () => {
             Examples
           </h2>
 
-          <div className="relative mx-auto flex h-20 w-full flex-row items-center justify-center border-b border-solid border-white/[.08] px-8 text-sm sm:text-base">
+          <div className="relative mx-auto flex h-20 w-full flex-row items-center justify-center border-b border-solid border-white/8 px-8 text-sm sm:text-base">
             <span
-              className="absolute bottom-0 top-0 -z-10 flex overflow-hidden transition-all duration-300"
+              className="absolute top-0 bottom-0 -z-10 flex overflow-hidden transition-all duration-300"
               style={{ left: tabUnderlineLeft, width: tabUnderlineWidth }}
             >
-              <span className="h-full w-full border-b-2 border-b-accent" />
+              <span className="border-b-accent h-full w-full border-b-2" />
             </span>
             <button
               ref={(el) => {
@@ -142,7 +142,7 @@ const Home = () => {
               }}
               className={`${
                 activeExample === 'router' ? `` : `hover:text-neutral-300`
-              } my-auto flex cursor-pointer select-none flex-col items-center rounded-full px-4 py-2 text-white focus:outline-none`}
+              } my-auto flex cursor-pointer flex-col items-center rounded-full px-4 py-2 text-white select-none focus:outline-hidden`}
               onClick={() => {
                 setActiveExample('router');
                 window.location.hash = '#router';
@@ -158,7 +158,7 @@ const Home = () => {
               }}
               className={`${
                 activeExample === 'isochrones' ? `` : `hover:text-neutral-300`
-              } my-auto flex cursor-pointer select-none flex-col items-center rounded-full px-4 py-2 text-white focus:outline-none`}
+              } my-auto flex cursor-pointer flex-col items-center rounded-full px-4 py-2 text-white select-none focus:outline-hidden`}
               onClick={() => {
                 setActiveExample('isochrones');
                 window.location.hash = '#isochrones';
@@ -185,7 +185,7 @@ const Home = () => {
               <p>
                 An example client-side transit router running in the browser
                 with a web worker. It uses the full data from the Swiss GTFS
-                feed for a day (Monday May 27th 2025) from{' '}
+                feed for a day (Tuesday November 18th 2025) from{' '}
                 <a
                   href="https://opentransportdata.swiss"
                   target="_blank"
@@ -223,7 +223,7 @@ const Home = () => {
               <p>
                 An example isochrone map running in the browser with a web
                 worker. It uses the full data from the Swiss GTFS feed for a day
-                (Monday May 27th 2025) from{' '}
+                (Tuesday November 18th 2025) from{' '}
                 <a
                   href="https://opentransportdata.swiss"
                   target="_blank"

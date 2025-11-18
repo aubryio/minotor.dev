@@ -1,9 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import { Duration } from 'luxon';
 
 export const fetchCompressedData = async (
-  location: string,
+  location: URL,
 ): Promise<Uint8Array> => {
   const response = await fetch(location, {
     headers: { Accept: 'application/octet-stream' },

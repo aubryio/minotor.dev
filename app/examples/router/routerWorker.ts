@@ -29,8 +29,12 @@ async function initialize(): Promise<{
   stopsIndex: StopsIndex;
 }> {
   const [timetableData, stopsIndexData] = await Promise.all([
-    fetchCompressedData('/2025-05-27_timetable_3.bin'),
-    fetchCompressedData('/2025-05-27_stops_3.bin'),
+    fetchCompressedData(
+      new URL('/2025-11-18_timetable.bin', self.location?.origin),
+    ),
+    fetchCompressedData(
+      new URL('/2025-11-18_stops.bin', self.location?.origin),
+    ),
   ]);
   const timetable = Timetable.fromData(timetableData);
   const stopsIndex = StopsIndex.fromData(stopsIndexData);
@@ -91,9 +95,9 @@ const resolveArrivals = async (
   const startTimestamp = Time.fromDate(searchParams.departureTime).toMinutes();
 
   let nbArrivals = 0;
-  for (const entry of result.earliestArrivals) {
+  for (const entry of result.routingState.earliestArrivals) {
     if (
-      entry[1].time.toMinutes() - startTimestamp <
+      entry[1].arrival.toMinutes() - startTimestamp <
       searchParams.maxDuration / 60
     ) {
       nbArrivals++;
@@ -102,8 +106,8 @@ const resolveArrivals = async (
 
   const floatArray = new Float32Array(nbArrivals * 3);
   let offset = 0;
-  for (const [stopId, reachingTime] of result.earliestArrivals) {
-    const duration = reachingTime.time.toMinutes() - startTimestamp;
+  for (const [stopId, reachingTime] of result.routingState.earliestArrivals) {
+    const duration = reachingTime.arrival.toMinutes() - startTimestamp;
     if (duration < searchParams.maxDuration / 60) {
       const stop = stopsIndex.findStopById(stopId)!;
       const position = [stop.lon ?? 0, stop.lat ?? 0] as [number, number];

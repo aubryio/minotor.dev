@@ -55,6 +55,9 @@ const IsochronesMap: FC = () => {
   }, [isochronesParams.origin]);
 
   useEffect(() => {
+    let cancelled = false;
+    let timeout: NodeJS.Timeout;
+
     const fetchEarliestArrivals = async () => {
       const arrivals = await promiseRouterWorker.postMessage({
         type: 'arrivalsResolution',
@@ -62,16 +65,28 @@ const IsochronesMap: FC = () => {
         departureTime: isochronesParams.departureTime,
         maxDuration: isochronesParams.maxDuration,
       });
-      setLoading(false);
-      setEarliestArrivals(arrivals);
+      if (!cancelled) {
+        setLoading(false);
+        setEarliestArrivals(arrivals);
+      }
     };
-    setLoading(true);
+
+    timeout = setTimeout(() => {
+      if (!cancelled) {
+        setLoading(true);
+      }
+    }, 0);
+
     fetchEarliestArrivals();
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timeout);
+    };
   }, [
     isochronesParams.departureTime,
     isochronesParams.origin,
     isochronesParams.maxDuration,
-    setEarliestArrivals,
   ]);
   const getTooltip = useCallback(({ object }: ContourLayerPickingInfo) => {
     return object &&
@@ -184,7 +199,7 @@ const IsochronesMap: FC = () => {
 
   return (
     <div className="flex h-full w-full flex-col">
-      <div className="align-items flex h-16 flex-shrink-0 flex-row items-center justify-center pb-3 text-gray-400">
+      <div className="align-items flex h-16 shrink-0 flex-row items-center justify-center pb-3 text-gray-400">
         {loading ? (
           <>
             <MdOutlineTravelExplore className="mr-2" />{' '}
@@ -194,7 +209,7 @@ const IsochronesMap: FC = () => {
           <p>Drag the cursor to adjust start stop.</p>
         )}
       </div>
-      <div className="relative flex-grow overflow-hidden rounded-2xl">
+      <div className="relative grow overflow-hidden rounded-2xl">
         <DeckGL
           initialViewState={{
             longitude: 8.2275,

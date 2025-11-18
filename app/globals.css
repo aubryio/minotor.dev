@@ -1,6 +1,67 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-accent-light: #bae6fd;
+  --color-accent: #0ea5e9;
+  --color-accent-dark: #0369a1;
+
+  --animate-text-slide: text-slide 15s cubic-bezier(0.83, 0, 0.17, 1) infinite;
+
+  @keyframes text-slide {
+    0%,
+    13.33% {
+      transform: translateY(0%);
+    }
+    16.66%,
+    30% {
+      transform: translateY(-14.28%);
+    }
+    33.33%,
+    46.66% {
+      transform: translateY(-28.57%);
+    }
+    50%,
+    63.33% {
+      transform: translateY(-42.85%);
+    }
+    66.66%,
+    80% {
+      transform: translateY(-57.14%);
+    }
+    83.33%,
+    96.66% {
+      transform: translateY(-71.42%);
+    }
+    100% {
+      transform: translateY(-85.71%);
+    }
+  }
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
+  }
+}
 
 :root {
   --background: #0b0a0d;

@@ -5,13 +5,12 @@ import {
   Duration,
   Leg,
   Route,
-  ServiceRoute,
+  ServiceRouteInfo,
   SourceStopId,
   Stop,
   Time,
   Transfer,
   TransferType,
-  VehicleLeg,
 } from 'minotor';
 import VehicleLegItem from './VehicleLegItem';
 import TransferLegItem from './TransferLegItem';
@@ -39,9 +38,17 @@ type SerializedTransfer = SerializedBaseLeg & {
   type: string;
 };
 type SerializedVehicleLeg = SerializedBaseLeg & {
-  route: ServiceRoute;
+  route: ServiceRouteInfo;
   departureTime: SerializedTime;
   arrivalTime: SerializedTime;
+};
+
+type VehicleLeg = {
+  from: Stop;
+  to: Stop;
+  route: ServiceRouteInfo;
+  departureTime: Time;
+  arrivalTime: Time;
 };
 
 // Converts back a serialized route to a minotor route object

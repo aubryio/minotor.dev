@@ -13,7 +13,7 @@ const VehicleLegItem: FC<{ leg: VehicleLeg }> = ({ leg }) => {
           {route.name}
         </span>
       </div>
-      <div className="flex flex-1 flex-col border-l-4 border-accent p-4">
+      <div className="border-accent flex flex-1 flex-col border-l-4 p-4">
         <div className="mb-4">
           <h3 className="text-md">
             <span className="font-semibold">{departureTime.toString()}</span> -{' '}

@@ -72,7 +72,7 @@ const StopSearchField: FC<
         }}
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
-        className="w-full rounded-full border bg-white px-4 py-2 text-black focus:bg-[#f6f6f6] focus:outline-none"
+        className="w-full rounded-full border bg-white px-4 py-2 text-black focus:bg-[#f6f6f6] focus:outline-hidden"
       />
       {isDropdownVisible && searchValue && searchResults.length > 0 && (
         <ul className="absolute z-10 mt-2 max-h-40 w-full overflow-y-auto rounded-2xl border border-gray-300 bg-white px-1 py-1 text-black">
