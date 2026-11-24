@@ -1,9 +1,8 @@
 'use client';
-import { FC, Suspense } from 'react';
+import { FC } from 'react';
 import { RouteSearchProvider } from './RouteSearchContext';
 import SearchForm from './SearchForm';
 import RouterResults from './RouterResults';
-import RouterResultsSkeleton from './RouterResultsSkeleton';
 
 const TransitRouterExample: FC = () => {
   return (
@@ -11,9 +10,7 @@ const TransitRouterExample: FC = () => {
       <div className="flex flex-col items-center space-y-12 text-left">
         <SearchForm />
         <div>
-          <Suspense fallback={<RouterResultsSkeleton />}>
-            <RouterResults />
-          </Suspense>
+          <RouterResults />
         </div>
       </div>
     </RouteSearchProvider>

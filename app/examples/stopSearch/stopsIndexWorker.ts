@@ -1,8 +1,13 @@
-import { StopsIndex, SourceStopId } from 'minotor';
+import { DATASET } from '../dataset';
+import { StopsIndex, SourceStopId, Stop } from 'minotor';
 import { fetchCompressedData } from '../utils';
 import registerPromiseWorker from 'promise-worker/register';
 
+const hasSourceId = (stop: Stop): stop is Stop & { sourceStopId: string } =>
+  stop.sourceStopId !== undefined;
+
 let cachedIndex:
+  | undefined
   | {
       isInitialized: true;
       stopsIndex: StopsIndex;
@@ -18,7 +23,7 @@ async function initialize(): Promise<{
   stopsIndex: StopsIndex;
 }> {
   const stopsIndexData = await fetchCompressedData(
-    new URL('/2025-11-18_stops.bin', self.location?.origin),
+    new URL(DATASET.stops, self.location.origin),
   );
   const stopsIndex = StopsIndex.fromData(stopsIndexData);
   const result = { stopsIndex: stopsIndex };
@@ -35,10 +40,15 @@ async function getStopsIndex(): Promise<{
       return cachedIndex.initializing;
     }
   }
-  const router = initialize().then((result) => {
-    cachedIndex = { isInitialized: true, ...result };
-    return result;
-  });
+  const router = initialize()
+    .then((result) => {
+      cachedIndex = { isInitialized: true, ...result };
+      return result;
+    })
+    .catch((error: unknown) => {
+      cachedIndex = undefined;
+      throw error;
+    });
   cachedIndex = {
     isInitialized: false,
     initializing: router,
@@ -47,18 +57,18 @@ async function getStopsIndex(): Promise<{
   return router;
 }
 
-type StopSearchParams = {
+export type StopSearchParams = {
   type: 'findStopsByName';
   query: string;
   maxResults?: number;
 };
 
-type FindStopByIdParams = {
+export type FindStopByIdParams = {
   type: 'findStopBySourceId';
   stopId: SourceStopId;
 };
 
-type FindStopByLocationParams = {
+export type FindStopByLocationParams = {
   type: 'findStopsByLocation';
   lat: number;
   lon: number;
@@ -73,6 +83,8 @@ const searchStops = async (
 
   const stops = stopsIndex
     .findStopsByName(searchParams.query, searchParams.maxResults)
+    .filter(hasSourceId)
+    .filter((stop) => Number.isFinite(stop.lat) && Number.isFinite(stop.lon))
     .map((stop) => ({
       sourceId: stop.sourceStopId,
       name: stop.name,
@@ -88,7 +100,14 @@ const findStopBySourceId = async (
   const { stopsIndex } = await getStopsIndex();
 
   const stop = stopsIndex.findStopBySourceStopId(findStopParams.stopId);
-  if (!stop || stop.lat === undefined || stop.lon === undefined) {
+  if (
+    !stop ||
+    !hasSourceId(stop) ||
+    stop.lat === undefined ||
+    stop.lon === undefined ||
+    !Number.isFinite(stop.lat) ||
+    !Number.isFinite(stop.lon)
+  ) {
     return undefined;
   }
   return {
@@ -118,6 +137,8 @@ const findStopsByLocation = async (
       findStopParams.radius,
     )
     .filter((stop) => stop.lat !== undefined && stop.lon !== undefined)
+    .filter(hasSourceId)
+    .filter((stop) => Number.isFinite(stop.lat) && Number.isFinite(stop.lon))
     .map((stop) => ({
       sourceId: stop.sourceStopId,
       name: stop.name,
@@ -131,11 +152,11 @@ const stopsIndexHandler = async (
 ) => {
   switch (params.type) {
     case 'findStopsByName':
-      return searchStops(params as StopSearchParams);
+      return searchStops(params);
     case 'findStopBySourceId':
-      return findStopBySourceId(params as FindStopByIdParams);
+      return findStopBySourceId(params);
     case 'findStopsByLocation':
-      return findStopsByLocation(params as FindStopByLocationParams);
+      return findStopsByLocation(params);
   }
 };
 

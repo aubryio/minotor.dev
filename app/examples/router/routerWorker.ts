@@ -1,16 +1,15 @@
-import {
-  Router,
-  StopsIndex,
-  Timetable,
-  Query,
-  Time,
-  Route,
-  SourceStopId,
-} from 'minotor';
+import { DATASET } from '../dataset';
+import type {
+  RouterRequest,
+  RouterRequests,
+  RouterResponses,
+} from './messages';
+import { Router, StopsIndex, Timetable, Query } from 'minotor';
 import { fetchCompressedData } from '../utils';
 import registerPromiseWorker from 'promise-worker/register';
 
 let cachedRouter:
+  | undefined
   | {
       isInitialized: true;
       router: Router;
@@ -29,12 +28,8 @@ async function initialize(): Promise<{
   stopsIndex: StopsIndex;
 }> {
   const [timetableData, stopsIndexData] = await Promise.all([
-    fetchCompressedData(
-      new URL('/2025-11-18_timetable.bin', self.location?.origin),
-    ),
-    fetchCompressedData(
-      new URL('/2025-11-18_stops.bin', self.location?.origin),
-    ),
+    fetchCompressedData(new URL(DATASET.timetable, self.location.origin)),
+    fetchCompressedData(new URL(DATASET.stops, self.location.origin)),
   ]);
   const timetable = Timetable.fromData(timetableData);
   const stopsIndex = StopsIndex.fromData(stopsIndexData);
@@ -54,10 +49,15 @@ async function getRouter(): Promise<{
       return cachedRouter.initializing;
     }
   }
-  const router = initialize().then((result) => {
-    cachedRouter = { isInitialized: true, ...result };
-    return result;
-  });
+  const router = initialize()
+    .then((result) => {
+      cachedRouter = { isInitialized: true, ...result };
+      return result;
+    })
+    .catch((error: unknown) => {
+      cachedRouter = undefined;
+      throw error;
+    });
   cachedRouter = {
     isInitialized: false,
     initializing: router,
@@ -66,83 +66,67 @@ async function getRouter(): Promise<{
   return router;
 }
 
-type ArrivalsResolutionParams = {
-  type: 'arrivalsResolution';
-  origin: SourceStopId;
-  departureTime: Date;
-  maxTransfers: number;
-  maxDuration: number;
-};
-
-type RoutingParams = {
-  type: 'routing';
-  destination: SourceStopId;
-  origin: SourceStopId;
-  departureTime: Date;
-  maxTransfers: number;
-};
-
 const resolveArrivals = async (
-  searchParams: ArrivalsResolutionParams,
-): Promise<{ src: Float32Array; length: number }> => {
+  searchParams: RouterRequests['arrivalsResolution'],
+): Promise<RouterResponses['arrivalsResolution']> => {
   const { router, stopsIndex } = await getRouter();
+  const origin = stopsIndex.findStopBySourceStopId(searchParams.origin);
+  if (!origin) throw new Error('Origin stop not found in the timetable.');
   const query = new Query.Builder()
-    .from(searchParams.origin)
-    .departureTime(Time.fromDate(searchParams.departureTime))
-    .maxTransfers(5)
+    .from(origin.id)
+    .departureTime(searchParams.departureTime)
+    .maxTransfers(searchParams.maxTransfers)
     .build();
   const result = router.route(query);
-  const startTimestamp = Time.fromDate(searchParams.departureTime).toMinutes();
+  const startTimestamp = searchParams.departureTime;
 
-  let nbArrivals = 0;
-  for (const entry of result.routingState.earliestArrivals) {
+  const coordinates: number[] = [];
+  for (const { stop: stopId, arrival } of result.arrivals()) {
+    const duration = arrival - startTimestamp;
+    const stop = stopsIndex.findStopById(stopId);
     if (
-      entry[1].arrival.toMinutes() - startTimestamp <
-      searchParams.maxDuration / 60
-    ) {
-      nbArrivals++;
-    }
+      !Number.isFinite(duration) ||
+      duration < 0 ||
+      stop?.lon === undefined ||
+      stop.lat === undefined ||
+      !Number.isFinite(stop.lon) ||
+      !Number.isFinite(stop.lat)
+    )
+      continue;
+    coordinates.push(stop.lon, stop.lat, duration);
   }
-
-  const floatArray = new Float32Array(nbArrivals * 3);
-  let offset = 0;
-  for (const [stopId, reachingTime] of result.routingState.earliestArrivals) {
-    const duration = reachingTime.arrival.toMinutes() - startTimestamp;
-    if (duration < searchParams.maxDuration / 60) {
-      const stop = stopsIndex.findStopById(stopId)!;
-      const position = [stop.lon ?? 0, stop.lat ?? 0] as [number, number];
-
-      floatArray[offset] = position[0];
-      floatArray[offset + 1] = position[1];
-      floatArray[offset + 2] = duration;
-      offset += 3;
-    }
-  }
-  return { src: floatArray, length: nbArrivals };
+  const src = new Float32Array(coordinates);
+  return { src, length: src.length / 3 };
 };
 
 const resolveRoute = async (
-  searchParams: RoutingParams,
-): Promise<Route | undefined> => {
+  searchParams: RouterRequests['routing'],
+): Promise<RouterResponses['routing']> => {
+  const { router, stopsIndex } = await getRouter();
+  const origin = stopsIndex.findStopBySourceStopId(searchParams.origin);
+  if (!origin) throw new Error('Origin stop not found in the timetable.');
+  const destination = stopsIndex.findStopBySourceStopId(
+    searchParams.destination,
+  );
+  if (!destination)
+    throw new Error('Destination stop not found in the timetable.');
   const query = new Query.Builder()
-    .from(searchParams.origin)
-    .to(searchParams.destination)
-    .departureTime(Time.fromDate(searchParams.departureTime))
-    .maxTransfers(4)
+    .from(origin.id)
+    .to(destination.id)
+    .departureTime(searchParams.departureTime)
+    .maxTransfers(searchParams.maxTransfers)
     .build();
-  const { router } = await getRouter();
   const result = router.route(query);
-  return result.bestRoute(searchParams.destination);
+  const route = result.bestRoute();
+  return route ? { legs: route.legs } : undefined;
 };
 
-const routerHandler = async (
-  params: RoutingParams | ArrivalsResolutionParams,
-) => {
+const routerHandler = async (params: RouterRequest) => {
   switch (params.type) {
     case 'arrivalsResolution':
-      return resolveArrivals(params as ArrivalsResolutionParams);
+      return resolveArrivals(params);
     case 'routing':
-      return resolveRoute(params as RoutingParams);
+      return resolveRoute(params);
   }
 };
 

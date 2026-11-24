@@ -6,30 +6,30 @@ import { IoBoatOutline } from 'react-icons/io5';
 import { PiCableCar } from 'react-icons/pi';
 import { LiaCogSolid } from 'react-icons/lia';
 import { LiaBusAltSolid } from 'react-icons/lia';
-import { RouteType } from 'minotor';
+import { RouteType, RouteTypes } from 'minotor';
 import { FC } from 'react';
 
 const RouteTypeIcon: FC<{ routeType: RouteType }> = ({ routeType }) => {
   switch (routeType) {
-    case 'TRAM':
+    case RouteTypes.TRAM:
       return <LiaTramSolid />;
-    case 'SUBWAY':
+    case RouteTypes.SUBWAY:
       return <LiaSubwaySolid />;
-    case 'RAIL':
+    case RouteTypes.RAIL:
       return <LiaTrainSolid />;
-    case 'BUS':
+    case RouteTypes.BUS:
       return <LiaBusSolid />;
-    case 'FERRY':
+    case RouteTypes.FERRY:
       return <IoBoatOutline />;
-    case 'CABLE_TRAM':
+    case RouteTypes.CABLE_TRAM:
       return <PiCableCar />;
-    case 'AERIAL_LIFT':
+    case RouteTypes.AERIAL_LIFT:
       return <PiCableCar />;
-    case 'FUNICULAR':
+    case RouteTypes.FUNICULAR:
       return <LiaCogSolid />;
-    case 'TROLLEYBUS':
+    case RouteTypes.TROLLEYBUS:
       return <LiaBusAltSolid />;
-    case 'MONORAIL':
+    case RouteTypes.MONORAIL:
       return <LiaTrainSolid />;
     default:
       return <LiaTrainSolid />;

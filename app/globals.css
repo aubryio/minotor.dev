@@ -8,35 +8,43 @@
   --color-accent: #0ea5e9;
   --color-accent-dark: #0369a1;
 
-  --animate-text-slide: text-slide 15s cubic-bezier(0.83, 0, 0.17, 1) infinite;
+  --animate-text-slide: text-slide 20s cubic-bezier(0.83, 0, 0.17, 1) infinite;
 
   @keyframes text-slide {
     0%,
-    13.33% {
+    10% {
       transform: translateY(0%);
     }
-    16.66%,
-    30% {
-      transform: translateY(-14.28%);
+    12.5%,
+    22.5% {
+      transform: translateY(calc(-100% / 9));
     }
-    33.33%,
-    46.66% {
-      transform: translateY(-28.57%);
+    25%,
+    35% {
+      transform: translateY(calc(-200% / 9));
+    }
+    37.5%,
+    47.5% {
+      transform: translateY(calc(-300% / 9));
     }
     50%,
-    63.33% {
-      transform: translateY(-42.85%);
+    60% {
+      transform: translateY(calc(-400% / 9));
     }
-    66.66%,
-    80% {
-      transform: translateY(-57.14%);
+    62.5%,
+    72.5% {
+      transform: translateY(calc(-500% / 9));
     }
-    83.33%,
-    96.66% {
-      transform: translateY(-71.42%);
+    75%,
+    85% {
+      transform: translateY(calc(-600% / 9));
+    }
+    87.5%,
+    97.5% {
+      transform: translateY(calc(-700% / 9));
     }
     100% {
-      transform: translateY(-85.71%);
+      transform: translateY(calc(-800% / 9));
     }
   }
 }
@@ -72,4 +80,11 @@ body {
   color: var(--foreground);
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+@layer base {
+  :where(a, button, input):focus-visible {
+    outline: 2px solid var(--color-accent-light);
+    outline-offset: 3px;
+  }
 }

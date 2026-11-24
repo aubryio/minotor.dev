@@ -1,5 +1,5 @@
 'use client';
-import { FC, Suspense } from 'react';
+import { FC } from 'react';
 import StopSearchField from '../stopSearch/StopSearchField';
 import TimePicker from '../TimePicker';
 import { SourceStopId } from 'minotor';
@@ -9,50 +9,36 @@ const SearchForm: FC = () => {
   const dispatch = useRouteSearchDispatch();
   const routeSearch = useRouteSearch();
 
-  const fallbackSkeleton = (
+  return (
     <div className="flex flex-col items-center justify-between space-y-2 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-2">
       <label htmlFor="origin" className="self-center">
         From
       </label>
-      <div className="h-10 w-52 animate-pulse rounded-full bg-gray-200"></div>
+      <StopSearchField
+        value={routeSearch.origin}
+        onChange={(stop: SourceStopId) => {
+          dispatch({
+            type: 'set_origin',
+            origin: stop,
+          });
+        }}
+        placeholder="Origin"
+        id="origin"
+      />
       <label htmlFor="destination" className="self-center">
         to
       </label>
-      <div className="h-10 w-52 animate-pulse rounded-full bg-gray-200"></div>
-    </div>
-  );
-  return (
-    <div className="flex flex-col items-center justify-between space-y-2 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-2">
-      <Suspense fallback={fallbackSkeleton}>
-        <label htmlFor="origin" className="self-center">
-          From
-        </label>
-        <StopSearchField
-          value={routeSearch.origin}
-          onChange={(stop: SourceStopId) => {
-            dispatch({
-              type: 'set_origin',
-              origin: stop,
-            });
-          }}
-          placeholder="Origin"
-          id="origin"
-        />
-        <label htmlFor="destination" className="self-center">
-          to
-        </label>
-        <StopSearchField
-          value={routeSearch.destination}
-          onChange={(stop) => {
-            dispatch({
-              type: 'set_destination',
-              destination: stop,
-            });
-          }}
-          placeholder="Destination"
-          id="destination"
-        />
-      </Suspense>
+      <StopSearchField
+        value={routeSearch.destination}
+        onChange={(stop) => {
+          dispatch({
+            type: 'set_destination',
+            destination: stop,
+          });
+        }}
+        placeholder="Destination"
+        id="destination"
+      />
       <label htmlFor="time" className="self-center">
         at
       </label>

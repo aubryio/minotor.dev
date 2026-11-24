@@ -86,7 +86,6 @@ export type IsochronesParamsState = {
   departureTime: Date;
   cellSize: number;
   maxDuration: number;
-  showTransfers: boolean;
 };
 
 export type IsochronesParamsAction =
@@ -96,9 +95,8 @@ export type IsochronesParamsAction =
   | { type: 'set_max_duration'; maxDuration: number };
 
 const initialIsochronesParamsState = {
-  origin: 'Parent8504100',
+  origin: 'Parentch:1:sloid:4100',
   departureTime: new Date(new Date().setHours(8, 30, 0, 0)),
   cellSize: 2000,
-  maxDuration: 60 * 60 * (isIOS ? 2 : 3),
-  showTransfers: false,
+  maxDuration: 60 * (isIOS ? 2 : 3),
 };
