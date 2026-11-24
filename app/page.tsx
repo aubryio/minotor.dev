@@ -1,106 +1,45 @@
-'use client';
-import dynamic from 'next/dynamic';
 import { FaGithubAlt } from 'react-icons/fa';
-import { LuCopy } from 'react-icons/lu';
 import GetStarted from '../doc/get-started.mdx';
-import { ErrorBoundary } from 'react-error-boundary';
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { TbRoute } from 'react-icons/tb';
-import { GiSwitzerland } from 'react-icons/gi';
-
-type Example = 'router' | 'isochrones';
+import ExampleSwitcher from './examples/ExampleSwitcher';
+import CopyInstallCommand from './CopyInstallCommand';
+import { DATASET } from './examples/dataset';
 
 const Home = () => {
-  const tabsRef = useRef<Record<Example, HTMLElement | null>>({
-    router: null,
-    isochrones: null,
-  });
-  const [tabUnderlineWidth, setTabUnderlineWidth] = useState(0);
-  const [tabUnderlineLeft, setTabUnderlineLeft] = useState(0);
-  const [activeExample, setActiveExample] = useState<'router' | 'isochrones'>(
-    'router',
-  );
-  useLayoutEffect(() => {
-    const hash = window.location.hash;
-    if (hash === '#isochrones') {
-      setActiveExample('isochrones');
-    } else if (hash === '#router') {
-      setActiveExample('router');
-    }
-  }, []);
-
-  useEffect(() => {
-    const setTabPosition = () => {
-      const currentTab = tabsRef.current[activeExample] as HTMLElement;
-      setTabUnderlineLeft(currentTab?.offsetLeft ?? 0);
-      setTabUnderlineWidth(currentTab?.clientWidth ?? 0);
-    };
-
-    setTabPosition();
-  }, [activeExample]);
-
-  const TransitRouterExample = dynamic(
-    () => import('./examples/planner/TransitRouterExample'),
-    {
-      loading: () => (
-        <p className="flex min-h-[442px] items-center justify-center py-6">
-          Loading the demo...
-        </p>
-      ),
-      ssr: false,
-    },
-  );
-  const IsochronesMapExample = dynamic(
-    () => import('./examples/isochrones/IsochronesMapExample'),
-    {
-      loading: () => (
-        <p className="flex min-h-[442px] items-center justify-center py-6">
-          Loading the demo...
-        </p>
-      ),
-      ssr: false,
-    },
-  );
   return (
     <div className="grid min-h-screen grid-rows-[20px_1fr_20px] items-center justify-items-center gap-16 p-8 pb-20 font-(family-name:--font-hanken-sans) sm:p-20">
-      <main className="row-start-2 flex max-w-(--breakpoint-md) flex-col items-center gap-8 gap-y-4 sm:items-start">
+      <main className="row-start-2 flex w-full max-w-(--breakpoint-md) min-w-0 flex-col items-center gap-8 gap-y-4 sm:items-start">
         <h1 className="text-4xl font-bold sm:text-5xl">
           m<span className="text-accent">i</span>notor
         </h1>
         <h2 className="text-xl sm:text-2xl">
           A public transit routing library built for{' '}
           <span className="text-accent inline-flex h-[calc(var(--text-xl)*(var(--leading-tight)))] flex-col overflow-hidden sm:h-[calc(var(--text-2xl)*(var(--leading-tight)))]">
-            <ul className="animate-text-slide block text-left leading-tight [&_li]:block">
+            <ul className="animate-text-slide block text-left leading-tight motion-reduce:animate-none [&_li]:block">
               <li>data viz.</li>
               <li>research.</li>
               <li>privacy.</li>
               <li>the web.</li>
               <li>mobile apps.</li>
               <li>data science.</li>
+              <li>agents.</li>
+              <li>AI.</li>
               <li aria-hidden="true">data viz.</li>
             </ul>
           </span>
         </h2>
-        <section className="space-y-4 text-justify">
+        <section className="space-y-4 text-left">
           <p>
             Minotor is an open-source transit routing library for the browser,
-            nodejs servers and react-native apps. It supports extended GTFS
-            feeds parsing, complex routing queries, geographic and textual stops
-            search. Unlike most transit planners out there, minotor can store
-            all the transit data for a given day in memory on the client,
-            allowing for fast runtime queries using only local data.{' '}
+            Node.js servers and React Native apps. It supports standard and
+            extended GTFS feeds, virtual walking transfers, geographic and
+            textual stop search, point and range routing queries, and isochrone
+            computation. Minotor can store all the transit data for a given day
+            in memory on the client, allowing for fast runtime queries using
+            only local data.
           </p>
         </section>
         <div className="flex flex-col items-center gap-4 pt-4 sm:flex-row">
-          <code className="border-accent flex items-center rounded-full border-2 bg-black px-7 py-4 font-(family-name:--font-dm-mono) text-sm tracking-tight text-white">
-            npm i minotor
-            <button
-              onClick={() => navigator.clipboard.writeText('npm i minotor')}
-              className="ml-4"
-            >
-              <LuCopy />
-            </button>
-          </code>
+          <CopyInstallCommand />
           <div className="flex flex-row items-center gap-4">
             <a
               className="flex h-10 items-center justify-center gap-2 rounded-full border border-solid border-white/[.145] px-4 text-sm transition-colors hover:border-transparent hover:bg-[#1a1a1a] sm:h-12 sm:px-5 sm:text-base"
@@ -108,6 +47,7 @@ const Home = () => {
               target="_blank"
               rel="noopener noreferrer"
             >
+              <span className="sr-only">Minotor on GitHub</span>
               <FaGithubAlt className="text-xl" />
             </a>
             <a
@@ -118,9 +58,52 @@ const Home = () => {
             </a>
           </div>
         </div>
+        <section id="features" className="mt-2 w-full space-y-5 pt-6 text-left">
+          <h2 className="text-xl sm:text-2xl">
+            <a href="#features" className="text-gray-400 hover:underline">
+              #
+            </a>{' '}
+            Features
+          </h2>
+          <ul
+            role="list"
+            className="[&_li]:border-accent/50 grid gap-x-8 gap-y-6 sm:grid-cols-2 [&_li]:border-l-2 [&_li]:pl-4 [&_p]:mt-1 [&_p]:text-sm [&_p]:leading-relaxed [&_p]:text-gray-400 [&_strong]:block [&_strong]:font-semibold"
+          >
+            <li>
+              <strong>GTFS parsing</strong>
+              <p>Read feeds with standard and extended profiles.</p>
+            </li>
+            <li>
+              <strong>Virtual walking transfers</strong>
+              <p>
+                Connect nearby stops missing from the feed&apos;s transfer data.
+              </p>
+            </li>
+            <li>
+              <strong>Stop search</strong>
+              <p>Find stops by name, source ID, or location.</p>
+            </li>
+            <li>
+              <strong>Point queries</strong>
+              <p>Find the earliest arrival from a given departure time.</p>
+            </li>
+            <li>
+              <strong>Range queries</strong>
+              <p>Compare Pareto-optimal journeys within a departure window.</p>
+            </li>
+            <li>
+              <strong>Reachability</strong>
+              <p>
+                Map earliest arrivals or shortest travel times across the
+                network.
+              </p>
+            </li>
+          </ul>
+        </section>
+
         <section
           id="example-usage"
-          className="mt-2 space-y-4 pt-10 text-justify"
+          className="mt-2 w-full space-y-4 pt-4 text-left"
         >
           <h2 className="text-xl sm:text-2xl">
             <a href="#example-usage" className="text-gray-400 hover:underline">
@@ -129,140 +112,80 @@ const Home = () => {
             Examples
           </h2>
 
-          <div className="relative mx-auto flex h-20 w-full flex-row items-center justify-center border-b border-solid border-white/8 px-8 text-sm sm:text-base">
-            <span
-              className="absolute top-0 bottom-0 -z-10 flex overflow-hidden transition-all duration-300"
-              style={{ left: tabUnderlineLeft, width: tabUnderlineWidth }}
-            >
-              <span className="border-b-accent h-full w-full border-b-2" />
-            </span>
-            <button
-              ref={(el) => {
-                tabsRef.current['router'] = el;
-              }}
-              className={`${
-                activeExample === 'router' ? `` : `hover:text-neutral-300`
-              } my-auto flex cursor-pointer flex-col items-center rounded-full px-4 py-2 text-white select-none focus:outline-hidden`}
-              onClick={() => {
-                setActiveExample('router');
-                window.location.hash = '#router';
-              }}
-              id="router"
-            >
-              <TbRoute />
-              Transit Planner
-            </button>
-            <button
-              ref={(el) => {
-                tabsRef.current['isochrones'] = el;
-              }}
-              className={`${
-                activeExample === 'isochrones' ? `` : `hover:text-neutral-300`
-              } my-auto flex cursor-pointer flex-col items-center rounded-full px-4 py-2 text-white select-none focus:outline-hidden`}
-              onClick={() => {
-                setActiveExample('isochrones');
-                window.location.hash = '#isochrones';
-              }}
-              id="isochrones"
-            >
-              <GiSwitzerland />
-              Isochrones Map
-            </button>
-          </div>
-          {activeExample === 'router' && (
-            <>
-              <div>
-                <ErrorBoundary
-                  fallback={
-                    <p className="flex min-h-[442px] items-center justify-center py-6">
-                      Something went wrong with the router.
-                    </p>
-                  }
-                >
-                  <TransitRouterExample />
-                </ErrorBoundary>
-              </div>
-              <p>
-                An example client-side transit router running in the browser
-                with a web worker. It uses the full data from the Swiss GTFS
-                feed for a day (Tuesday November 18th 2025) from{' '}
-                <a
-                  href="https://opentransportdata.swiss"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-accent hover:underline"
-                >
-                  opentransportdata.swiss
-                </a>{' '}
-                , loaded in memory (thus works offline too). Check out{' '}
-                <a
-                  href="https://github.com/aubryio/minotor.dev/tree/main/app/examples/planner"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-accent hover:underline"
-                >
-                  the code from this example
-                </a>
-                .
-              </p>
-            </>
-          )}
-          {activeExample === 'isochrones' && (
-            <>
-              <div>
-                <ErrorBoundary
-                  fallback={
-                    <p className="flex min-h-[442px] items-center justify-center py-6">
-                      Something went wrong with the router.
-                    </p>
-                  }
-                >
-                  <IsochronesMapExample />
-                </ErrorBoundary>
-              </div>
-              <p>
-                An example isochrone map running in the browser with a web
-                worker. It uses the full data from the Swiss GTFS feed for a day
-                (Tuesday November 18th 2025) from{' '}
-                <a
-                  href="https://opentransportdata.swiss"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-accent hover:underline"
-                >
-                  opentransportdata.swiss
-                </a>{' '}
-                loaded in memory and computes the arrival time to all stops in
-                the network in real time before rendering the corresponding
-                isochrones with deck.gl. Check out{' '}
-                <a
-                  href="https://github.com/aubryio/minotor.dev/tree/main/app/examples/isochrones"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-accent hover:underline"
-                >
-                  the code from this example
-                </a>
-                .
-              </p>
-              <p>
-                A more complete isochrone map showcase relying on minotor can be
-                found on{' '}
-                <a
-                  href="https://isochrone.ch"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-accent hover:underline"
-                >
-                  isochrone.ch
-                </a>
-                .
-              </p>
-            </>
-          )}
+          <ExampleSwitcher
+            routerDescription={
+              <>
+                <p>
+                  An example client-side transit router running in the browser
+                  with a web worker. It uses the full data from the Swiss GTFS
+                  feed for a day ({DATASET.label}) from{' '}
+                  <a
+                    href="https://opentransportdata.swiss"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-accent hover:underline"
+                  >
+                    opentransportdata.swiss
+                  </a>{' '}
+                  , loaded in memory (thus works offline too). Check out{' '}
+                  <a
+                    href="https://github.com/aubryio/minotor.dev/tree/main/app/examples/planner"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-accent hover:underline"
+                  >
+                    the code from this example
+                  </a>
+                  .
+                </p>
+              </>
+            }
+            isochronesDescription={
+              <>
+                <p>
+                  An example isochrone map running in the browser with a web
+                  worker. It uses the full data from the Swiss GTFS feed for a
+                  day ({DATASET.label}) from{' '}
+                  <a
+                    href="https://opentransportdata.swiss"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-accent hover:underline"
+                  >
+                    opentransportdata.swiss
+                  </a>{' '}
+                  loaded in memory and computes the arrival time to all stops in
+                  the network in real time before rendering the corresponding
+                  isochrones with deck.gl. Check out{' '}
+                  <a
+                    href="https://github.com/aubryio/minotor.dev/tree/main/app/examples/isochrones"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-accent hover:underline"
+                  >
+                    the code from this example
+                  </a>
+                  .
+                </p>
+                <p>
+                  A more complete isochrone map showcase relying on minotor can
+                  be found on{' '}
+                  <a
+                    href="https://isochrone.ch"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-accent hover:underline"
+                  >
+                    isochrone.ch
+                  </a>
+                  .
+                </p>
+              </>
+            }
+          />
         </section>
 
-        <section id="documentation" className="mt-2 space-y-5 text-justify">
+        <section id="documentation" className="mt-2 w-full space-y-5 text-left">
           <h2 className="text-xl sm:text-2xl">
             <a href="#documentation" className="text-gray-400 hover:underline">
               #
@@ -298,7 +221,7 @@ const Home = () => {
           Author
         </a>
         <div className="flex w-full items-center justify-center text-sm text-gray-500">
-          minotor © 2025 Aubry Cholleton
+          minotor © 2025–2026 Aubry Cholleton
         </div>
       </footer>
     </div>

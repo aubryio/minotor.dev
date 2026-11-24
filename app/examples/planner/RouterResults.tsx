@@ -1,121 +1,65 @@
 'use client';
-import React, { FC } from 'react';
+import React, { FC, useMemo } from 'react';
 import { useRouteSearch } from './RouteSearchContext';
-import {
-  Duration,
-  Leg,
-  Route,
-  ServiceRouteInfo,
-  SourceStopId,
-  Stop,
-  Time,
-  Transfer,
-  TransferType,
-} from 'minotor';
+import { Route } from 'minotor';
 import VehicleLegItem from './VehicleLegItem';
 import TransferLegItem from './TransferLegItem';
 import { FaRegSadTear } from 'react-icons/fa';
-import { suspensify } from '../utils';
+import { formatTime, timeFromDate } from '../utils';
 import { promiseRouterWorker } from '../router/promiseRouterWorker';
 
-type SearchParams = {
-  origin: SourceStopId;
-  destination: SourceStopId;
-  departureTime: Date;
-};
-type SerializedDuration = { totalSeconds: number };
-type SerializedTime = { minutesSinceMidnight: number };
-type SerializedRoute = {
-  legs: SerializedLeg[];
-};
-type SerializedBaseLeg = {
-  from: Stop;
-  to: Stop;
-};
-type SerializedLeg = SerializedTransfer | SerializedVehicleLeg;
-type SerializedTransfer = SerializedBaseLeg & {
-  minTransferTime: SerializedDuration;
-  type: string;
-};
-type SerializedVehicleLeg = SerializedBaseLeg & {
-  route: ServiceRouteInfo;
-  departureTime: SerializedTime;
-  arrivalTime: SerializedTime;
-};
+import { useWorkerRequest } from '../useWorkerRequest';
+import type { RouterRequests } from '../router/messages';
+import RouterResultsSkeleton from './RouterResultsSkeleton';
 
-type VehicleLeg = {
-  from: Stop;
-  to: Stop;
-  route: ServiceRouteInfo;
-  departureTime: Time;
-  arrivalTime: Time;
+const resolveRoute = async (params: RouterRequests['routing']) => {
+  const result = await promiseRouterWorker.postMessage({
+    type: 'routing',
+    ...params,
+  });
+  return result ? new Route(result.legs) : undefined;
 };
-
-// Converts back a serialized route to a minotor route object
-const convertSerializedRouteToRoute = (
-  serializedRoute: SerializedRoute,
-): Route => {
-  const convertLeg = (serializedLeg: SerializedLeg): VehicleLeg | Transfer => {
-    if ('route' in serializedLeg) {
-      const vehicleLeg: VehicleLeg = {
-        ...serializedLeg,
-        departureTime: Time.fromMinutes(
-          serializedLeg.departureTime.minutesSinceMidnight,
-        ),
-        arrivalTime: Time.fromMinutes(
-          serializedLeg.arrivalTime.minutesSinceMidnight,
-        ),
-      };
-      return vehicleLeg;
-    } else {
-      const transfer: Transfer = {
-        ...serializedLeg,
-        minTransferTime: serializedLeg.minTransferTime
-          ? Duration.fromSeconds(serializedLeg.minTransferTime.totalSeconds)
-          : undefined,
-        type: serializedLeg.type as TransferType,
-      };
-      return transfer;
-    }
-  };
-
-  const legs = serializedRoute.legs.map(convertLeg) as Leg[];
-  return new Route(legs);
-};
-
 const RouterResults: FC = () => {
-  const routeSearch = useRouteSearch();
-  const routeResult = suspensify<Route | undefined>(
-    async (searchParams: SearchParams) => {
-      const routeResult = await promiseRouterWorker.postMessage({
-        type: 'routing',
-        ...searchParams,
-      });
-      return routeResult
-        ? convertSerializedRouteToRoute(routeResult)
-        : undefined;
-    },
-    'routeResult',
-    {
-      origin: routeSearch.origin,
-      destination: routeSearch.destination,
-      departureTime: routeSearch.departureTime,
-    },
-  ).read();
+  const { origin, destination, departureTime, nbTransfers } = useRouteSearch();
+  const request = useMemo(
+    () => ({
+      origin,
+      destination,
+      departureTime: timeFromDate(departureTime),
+      maxTransfers: nbTransfers,
+    }),
+    [origin, destination, departureTime, nbTransfers],
+  );
+  const {
+    data: routeResult,
+    loading,
+    error,
+    retry,
+  } = useWorkerRequest(resolveRoute, request);
+  if (loading) return <RouterResultsSkeleton />;
+  if (error)
+    return (
+      <div role="alert">
+        Unable to load this journey.{' '}
+        <button onClick={retry} className="text-accent underline">
+          Try again
+        </button>
+      </div>
+    );
 
   const timeline = routeResult?.legs.map((leg) => {
     if ('route' in leg) {
       return (
         <VehicleLegItem
           leg={leg}
-          key={`${leg.from.id}-${leg.to.id}-${leg.route.name}-${leg.departureTime.toMinutes()}`}
+          key={`${leg.from.id}-${leg.to.id}-${leg.route.name}-${leg.departureTime}`}
         />
       );
     } else {
       return (
         <TransferLegItem
           leg={leg}
-          key={`${leg.from.id}-${leg.to.id}-${leg.type}`}
+          key={`${leg.from.id}-${leg.to.id}-${'type' in leg ? leg.type : 'access'}`}
         />
       );
     }
@@ -131,7 +75,7 @@ const RouterResults: FC = () => {
         <p className="font-bold">
           Arrival at{' '}
           <span className="text-accent">
-            {routeResult?.arrivalTime().toString()}
+            {formatTime(routeResult.arrivalTime())}
           </span>{' '}
           {transfers > 0 ? (
             <>

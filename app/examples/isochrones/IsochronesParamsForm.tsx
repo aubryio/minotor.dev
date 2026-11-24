@@ -1,5 +1,5 @@
 'use client';
-import { FC, Suspense, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import StopSearchField from '../stopSearch/StopSearchField';
 import TimePicker from '../TimePicker';
 import { SourceStopId } from 'minotor';
@@ -13,44 +13,39 @@ import { isIOS } from 'react-device-detect';
 const MIN_RESOLUTION = 500;
 const MAX_RESOLUTION = 6000;
 
-const MIN_DURATION = 60 * 10;
-const MAX_DURATION = 60 * 60 * (isIOS ? 3 : 8);
+const MIN_DURATION = 10;
+const MAX_DURATION = 60 * (isIOS ? 3 : 8);
 
 const IsochronesParamsForm: FC = () => {
   const dispatch = useIsochronesParamsDispatch();
   const isochronesParams = useIsochronesParams();
   const [localCellSize, setLocalCellSize] = useState(isochronesParams.cellSize);
-  const [localMaxDuration, setLocalMaxDuration] = useState(
-    isochronesParams.maxDuration,
-  );
 
-  const fallbackSkeleton = (
-    <div className="flex flex-col items-center justify-between space-y-2 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-2">
-      <label htmlFor="origin" className="self-center">
-        From
-      </label>
-      <div className="h-10 w-52 animate-pulse rounded-full bg-gray-200"></div>
-    </div>
-  );
+  useEffect(() => {
+    const timeout = setTimeout(
+      () => dispatch({ type: 'set_cell_size', cellSize: localCellSize }),
+      100,
+    );
+    return () => clearTimeout(timeout);
+  }, [dispatch, localCellSize]);
+
   return (
     <div>
       <div className="flex flex-col items-center justify-between space-y-2 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-2">
-        <Suspense fallback={fallbackSkeleton}>
-          <label htmlFor="origin" className="self-center">
-            From
-          </label>
-          <StopSearchField
-            value={isochronesParams.origin}
-            onChange={(stop: SourceStopId) => {
-              dispatch({
-                type: 'set_origin',
-                origin: stop,
-              });
-            }}
-            placeholder="Origin"
-            id="origin"
-          />
-        </Suspense>
+        <label htmlFor="origin" className="self-center">
+          From
+        </label>
+        <StopSearchField
+          value={isochronesParams.origin}
+          onChange={(stop: SourceStopId) => {
+            dispatch({
+              type: 'set_origin',
+              origin: stop,
+            });
+          }}
+          placeholder="Origin"
+          id="origin"
+        />
         <label htmlFor="time" className="self-center">
           at
         </label>
@@ -75,51 +70,31 @@ const IsochronesParamsForm: FC = () => {
           min={MIN_RESOLUTION}
           max={MAX_RESOLUTION}
           value={MAX_RESOLUTION - localCellSize + MIN_RESOLUTION}
+          aria-valuetext={`${localCellSize} meters`}
           onChange={(e) => {
             setLocalCellSize(
               MAX_RESOLUTION - Number(e.target.value) + MIN_RESOLUTION,
             );
           }}
-          onMouseUp={() => {
-            dispatch({
-              type: 'set_cell_size',
-              cellSize: localCellSize,
-            });
-          }}
-          onTouchEnd={() => {
-            dispatch({
-              type: 'set_cell_size',
-              cellSize: localCellSize,
-            });
-          }}
           className="w-full accent-current"
         />
       </div>
       <div className="mt-4 flex flex-col items-center justify-center space-y-2 sm:flex-row">
-        <label htmlFor="cellSize" className="mt-[8px] sm:w-2/3">
-          Max duration: {humanizeDuration(localMaxDuration, true)}
+        <label htmlFor="maxDuration" className="mt-[8px] sm:w-2/3">
+          Max duration:{' '}
+          {humanizeDuration(isochronesParams.maxDuration * 60, true)}
         </label>
         <input
           type="range"
           id="maxDuration"
           min={MIN_DURATION}
           max={MAX_DURATION}
-          step={60 * 5}
-          value={localMaxDuration}
+          step={5}
+          value={isochronesParams.maxDuration}
+          aria-valuetext={humanizeDuration(isochronesParams.maxDuration * 60)}
           onChange={(e) => {
-            setLocalMaxDuration(Number(e.target.value));
-          }}
-          onMouseUp={() => {
-            dispatch({
-              type: 'set_max_duration',
-              maxDuration: localMaxDuration,
-            });
-          }}
-          onTouchEnd={() => {
-            dispatch({
-              type: 'set_max_duration',
-              maxDuration: localMaxDuration,
-            });
+            const maxDuration = Number(e.target.value);
+            dispatch({ type: 'set_max_duration', maxDuration });
           }}
           className="w-full accent-current"
         />

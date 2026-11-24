@@ -1,4 +1,3 @@
-'use client';
 import { Duration } from 'luxon';
 
 export const fetchCompressedData = async (
@@ -7,62 +6,17 @@ export const fetchCompressedData = async (
   const response = await fetch(location, {
     headers: { Accept: 'application/octet-stream' },
   });
-  const blob = await response.blob();
-  const stream = blob.stream();
-  const decompressionStream = new DecompressionStream('gzip');
-  const decompressedStream = stream.pipeThrough(decompressionStream);
+  if (!response.ok) {
+    throw new Error(`Failed to load transit data (${response.status}).`);
+  }
+  if (!response.body) throw new Error('Transit data response has no body.');
+  const decompressedStream = response.body.pipeThrough(
+    new DecompressionStream('gzip'),
+  );
   const decompressedResponse = new Response(decompressedStream);
   const arrayBuffer = await decompressedResponse.arrayBuffer();
   return new Uint8Array(arrayBuffer);
 };
-
-type SuspenseResult<T> = {
-  read: () => T;
-};
-
-const cache = new Map<string, SuspenseResult<unknown>>();
-
-export function suspensify<T>(
-  promiseFactory: (...args: any[]) => Promise<T>,
-  key: string,
-  ...args: any[]
-): SuspenseResult<T> {
-  const cacheKey = `${key}:${JSON.stringify(args)}`;
-
-  if (cache.has(cacheKey)) {
-    return cache.get(cacheKey) as SuspenseResult<T>;
-  }
-
-  let status: 'pending' | 'success' | 'error' = 'pending';
-  let result: T;
-  let error: unknown;
-
-  const promise = promiseFactory(...args).then(
-    (r) => {
-      status = 'success';
-      result = r;
-    },
-    (e) => {
-      status = 'error';
-      error = e;
-    },
-  );
-
-  const suspenseResult: SuspenseResult<T> = {
-    read() {
-      if (status === 'pending') {
-        throw promise;
-      } else if (status === 'error') {
-        throw error;
-      } else {
-        return result;
-      }
-    },
-  };
-
-  cache.set(cacheKey, suspenseResult);
-  return suspenseResult;
-}
 
 export const humanizeDuration = (durationInSeconds: number, short = false) => {
   const duration = Duration.fromObject({
@@ -81,3 +35,12 @@ export const humanizeDuration = (durationInSeconds: number, short = false) => {
     .replace(/ 0 minutes /, '')
     .replace(/ 0 seconds$/, '');
 };
+
+// Minotor represents times and durations in minutes.
+export const timeFromDate = (date: Date): number =>
+  Math.round(
+    (date.getHours() * 3600 + date.getMinutes() * 60 + date.getSeconds()) / 60,
+  );
+
+export const formatTime = (minutes: number): string =>
+  `${String(Math.floor(minutes / 60) % 24).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`;

@@ -12,37 +12,47 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         {children}
       </a>
     ),
-    code: ({ children }) => (
+    code: ({ children, className, ...props }) => (
       <code
-        className="font-(family-name:--font-dm-mono) text-sm"
-        style={{
-          whiteSpace: 'pre-line',
-          wordWrap: 'break-word',
-          wordBreak: 'break-all',
-        }}
+        {...props}
+        className={`font-(family-name:--font-dm-mono) text-sm wrap-anywhere sm:wrap-normal ${className ?? ''}`}
       >
         {children}
       </code>
     ),
-    figure: ({ children }) => <figure className="text-left">{children}</figure>,
-    pre: ({ children, style = '' }) => (
-      <pre className="rounded-2xl p-4" style={{ ...style }}>
+    figure: ({ children, ...props }) => (
+      <figure {...props} className="w-full min-w-0 text-left">
+        {children}
+      </figure>
+    ),
+    pre: ({ children, className, ...props }) => (
+      <pre
+        {...props}
+        className={`max-w-full overflow-x-auto rounded-2xl p-4 whitespace-pre-wrap sm:whitespace-pre ${className ?? ''}`}
+      >
         {children}
       </pre>
     ),
     h3: ({ children }) => {
       const id = children.toLowerCase().replace(/\s+/g, '-');
       return (
-        <h3
-          className="text-lg font-bold sm:text-xl"
-          id={id}
-          style={{ paddingBottom: '10px' }}
-        >
+        <h3 className="mb-3! pt-4 text-lg font-bold sm:text-xl" id={id}>
           <a href={`#${id}`} className="text-gray-400 hover:underline">
             #
           </a>{' '}
           {children}
         </h3>
+      );
+    },
+    h4: ({ children }) => {
+      const id = children.toLowerCase().replace(/\s+/g, '-');
+      return (
+        <h4 className="mb-3! pt-3 font-semibold" id={id}>
+          <a href={`#${id}`} className="text-gray-400 hover:underline">
+            #
+          </a>{' '}
+          {children}
+        </h4>
       );
     },
     ...components,

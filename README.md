@@ -4,7 +4,26 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
-First, run the development server:
+Use Node.js 24.15 or newer and npm 11.5.2 or newer. Install dependencies with `npm ci`, then run the development server.
+
+Type checking uses TypeScript 7 through the `@typescript/native` alias. The
+`typescript` alias supplies the TypeScript 6 API required by ESLint and Next.js
+([TypeScript compatibility guidance](https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/#running-side-by-side-with-typescript-6.0)).
+
+The bundled examples use the Swiss GTFS feed version `20261121`, exported for
+November 23, 2026 with Minotor 13.0.1. To reproduce the export:
+
+```bash
+curl -fL https://data.opentransportdata.swiss/en/dataset/timetable-2026-gtfs2020/permalink -o /tmp/swiss-gtfs.zip
+npx minotor parse-gtfs /tmp/swiss-gtfs.zip -d 2026-11-23 -p extended -t /tmp/timetable.bin -s /tmp/stops.bin
+gzip -n -c /tmp/timetable.bin > public/2026-11-23_timetable.bin
+gzip -n -c /tmp/stops.bin > public/2026-11-23_stops.bin
+```
+
+The feed permalink changes as new releases are published. Both `.bin` assets are
+gzip-compressed and must be generated together with the installed Minotor version.
+
+Start the development server:
 
 ```bash
 npm run dev
